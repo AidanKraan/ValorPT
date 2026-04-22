@@ -101,7 +101,7 @@ const CUES = {
 };
 
 /* ─── Real-time pose detection camera (MoveNet Lightning) ─── */
-const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoRef, animFrameRef }, ref) {
+const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoRef, animFrameRef, facingMode = 'user' }, ref) {
   const canvasRef = useRef(null);
   const detectorRef = useRef(null);
   const streamRef = useRef(null);
@@ -277,7 +277,8 @@ const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoR
         muted
         style={{
           width: "100%", height: "100%", objectFit: "cover",
-          transform: "scaleX(-1)", display: "block",
+          transform: facingMode === 'user' ? "scaleX(-1)" : "scaleX(1)",
+          display: "block",
           visibility: cameraActive ? "visible" : "hidden",
         }}
       />
@@ -287,7 +288,7 @@ const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoR
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
           pointerEvents: "none",
-          transform: "scaleX(-1)",
+          transform: facingMode === 'user' ? "scaleX(-1)" : "scaleX(1)",
         }}
       />
 
@@ -509,6 +510,7 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
           ref={poseRef}
           videoRef={videoRef}
           animFrameRef={animFrameRef}
+          facingMode={facingMode}
           countdown={countdown}
           onMetrics={handlePoseMetrics}
         />

@@ -36,10 +36,12 @@ function AIAvatar() {
   return (
     <div style={{
       width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-      background: `linear-gradient(135deg, ${T.greenDeep}, ${T.green})`,
+      overflow: "hidden", background: "#FFFFFF",
       display: "flex", alignItems: "center", justifyContent: "center",
-      boxShadow: `0 0 10px ${T.greenGlow}`, fontSize: 13, fontWeight: 900, color: "#fff",
-    }}>V</div>
+      boxShadow: `0 0 10px ${T.greenGlow}`,
+    }}>
+      <img src="https://i.imgur.com/TCSo4WN.png" alt="ValorPT" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@ import {
   User, Lock, Eye, EyeOff, ArrowRight, Building,
   Shield, CheckCircle
 } from "lucide-react";
-import { ValorIcon } from "./ValorLogo";
+import ValorLogo, { ValorIcon } from "./ValorLogo";
 
 const font = `'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif`;
 
@@ -215,18 +215,14 @@ export default function WelcomeScreen({ onBegin }) {
         display: "flex", flexDirection: "column", alignItems: "center",
         paddingTop: 52, width: "100%",
       }}>
-        {/* Logo + wordmark */}
+        {/* Logo */}
         <div style={{
           opacity: vis(5) ? 1 : 0,
           transform: vis(5) ? "translateY(0px) scale(1)" : "translateY(-40px) scale(0.92)",
           transition: "opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.34,1.56,0.64,1)",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
         }}>
-          <ValorIcon size={80} />
-          <div>
-            <span style={{ color: "#FFFFFF", fontWeight: 900, fontSize: 38, letterSpacing: -1.5 }}>VALOR</span>
-            <span style={{ color: "#00C853", fontWeight: 900, fontSize: 38, letterSpacing: -1.5 }}>PT</span>
-          </div>
+          <ValorLogo height={90} darkBg large />
         </div>
 
         {/* Tagline */}

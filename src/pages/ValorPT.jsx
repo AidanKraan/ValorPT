@@ -372,8 +372,8 @@ const SYM_DATA = [73, 75, 78, 80, 82, 84, 86, 87, 89, 90, 91, 92, 93];
    VALOR LOGO — imported from components/ValorLogo.jsx
 ═══════════════════════════════════════════════════════════════ */
 // ValorIcon, ValorLogo imported at top of file
-function ValorWatermark({ size = 200 }) {
-  return <div style={{ opacity: 0.06, pointerEvents: "none" }}><ValorIcon size={size}/></div>;
+function ValorWatermark() {
+  return null;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -775,7 +775,7 @@ function SplashScreen({ onDone }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 24, animation: fading ? "splashFadeOut 0.5s ease forwards" : "splashFadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
       <div style={{ animation: "scaleIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
-        <ValorLogo height={80} darkBg={true} />
+        <ValorLogo height={80} darkBg large />
       </div>
       <div style={{ animation: "fadeUp 0.6s 0.3s both", textAlign: "center" }}>
         <p style={{ color: T.gray, fontSize: 13, textAlign: "center", marginTop: 6, letterSpacing: 2, textTransform: "uppercase" }}>Clinical AI Motion Analysis</p>
@@ -819,7 +819,7 @@ function CelebrationScreen({ exercise, onDone }) {
         <div style={{ position: "absolute", inset: -8, borderRadius: "50%", boxShadow: `0 0 40px ${T.greenGlow}`, pointerEvents: "none" }}/>
       </div>
       <div style={{ textAlign: "center", animation: "fadeUp 0.5s 0.4s both", position: "relative", zIndex: 2 }}>
-        <div style={{ display: "flex", justifyContent: "center" }}><ValorLogo height={56} darkBg={true} /></div>
+        <div style={{ display: "flex", justifyContent: "center" }}><ValorLogo height={64} darkBg /></div>
         <h2 style={{ fontFamily: font, fontWeight: 900, fontSize: 34, color: T.white, marginTop: 16, letterSpacing: -0.8 }}>Great Work!</h2>
         <p style={{ color: T.gray, fontSize: 15, marginTop: 6 }}>{exercise?.name}</p>
       </div>
@@ -909,7 +909,7 @@ function Hero({ title, subtitle, right }) {
   return (
     <div style={{ background: "linear-gradient(180deg, #0D2818 0%, rgba(13,40,24,0.5) 60%, transparent 100%)", padding: "24px 20px 20px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -40, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.2) 0%, transparent 70%)", pointerEvents: "none" }}/>
-      <div style={{ position: "absolute", top: -10, right: 12, pointerEvents: "none" }}><ValorWatermark size={130}/></div>
+
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative" }}>
         <div>
           <h1 style={{ fontSize: 25, fontWeight: 900, color: T.white, lineHeight: 1.15, letterSpacing: -0.5, margin: 0, fontFamily: font }}>{title}</h1>
@@ -981,7 +981,7 @@ function PatientLogin({ onBegin }) {
       <AmbientBg/>
       <div style={{position:"absolute",top:"10%",left:"50%",transform:"translateX(-50%)",width:400,height:400,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 65%)",pointerEvents:"none"}}/>
       <div className="fadeUp" style={{textAlign:"center",marginBottom:48,position:"relative",zIndex:1}}>
-        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%, -50%)",opacity:0.06,pointerEvents:"none"}}><ValorIcon size={300}/></div>
+
         <div style={{position:"relative"}}><ValorLogo height={80} darkBg={true} /></div>
         <p style={{color:T.gray,fontSize:13,marginTop:6,letterSpacing:2,textTransform:"uppercase"}}>Clinical AI Motion Analysis</p>
       </div>
@@ -1081,8 +1081,8 @@ function SessionResults({ result, onNext, onEnd, onViewReport }) {
     <div className="fadeUp" style={{minHeight:"100vh",background:T.bg,color:T.white,paddingBottom:90}}>
       <div style={{background:"linear-gradient(135deg, #0D2818, rgba(27,94,32,0.6), #0A0A0A)",padding:"40px 24px 32px",textAlign:"center",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:320,height:320,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.14) 0%, transparent 65%)",pointerEvents:"none"}}/>
-        <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",opacity:0.08,pointerEvents:"none"}}><ValorIcon size={220}/></div>
-        <div style={{display:"flex",justifyContent:"center",marginBottom:16,position:"relative"}}><ValorLogo height={48} darkBg={true} /></div>
+
+        <div style={{display:"flex",justifyContent:"center",marginBottom:16,position:"relative"}}><ValorLogo height={64} darkBg /></div>
         <div style={{display:"flex",justifyContent:"center",marginBottom:14,position:"relative"}}>
           <div style={{width:72,height:72,borderRadius:"50%",background:T.greenDim,border:`1px solid ${T.greenBorder}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 24px ${T.greenGlow}`}}><CheckCircle size={36} color={T.green}/></div>
         </div>
@@ -1184,7 +1184,7 @@ function TopNav({ active, onNav }) {
   const tabs=[{id:"patients",Icon:Users,label:"Patients"},{id:"analytics",Icon:BarChart2,label:"Analytics"},{id:"messages",Icon:MessageSquare,label:"Messages"},{id:"settings",Icon:Settings,label:"Settings"}];
   return (
     <div style={{background:"rgba(8,8,8,0.96)",backdropFilter:"blur(24px)",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",padding:"0 16px",position:"sticky",top:0,zIndex:100}}>
-      <div style={{padding:"10px 14px 10px 0",marginRight:4,display:"flex",alignItems:"center"}}><ValorLogo height={32} darkBg={true} /></div>
+      <div style={{padding:"10px 14px 10px 0",marginRight:4,display:"flex",alignItems:"center"}}><ValorLogo height={28} navStyle /></div>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>{tabs.map(({id,Icon:IconCmp,label})=>{const isActive=active===id;return(<button key={id} onClick={()=>onNav(id)} style={{background:"none",border:"none",padding:"14px 10px",display:"flex",alignItems:"center",gap:5,color:isActive?T.green:T.gray,fontWeight:isActive?700:400,fontSize:12,cursor:"pointer",fontFamily:font,borderBottom:isActive?`2px solid ${T.green}`:"2px solid transparent",transition:"all 0.2s",whiteSpace:"nowrap"}}><IconCmp size={14}/>{label}</button>);})}</div>
       <div style={{width:32,height:32,borderRadius:"50%",background:`linear-gradient(135deg, ${T.greenDeep}, ${T.green})`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:12,color:T.white,flexShrink:0}}>DR</div>
     </div>

@@ -303,7 +303,10 @@ function ShareModal({ patient, onClose }) {
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
             <div>
-              <div style={{ color: T.green, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>ValorPT · Session Report</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ background: "#fff", borderRadius: 6, padding: "2px 8px" }}><img src="https://i.imgur.com/TCSo4WN.png" alt="ValorPT" height={22} style={{ height: 22, width: "auto", objectFit: "contain", display: "block" }} /></div>
+            <span style={{ color: T.green, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Session Report</span>
+          </div>
               <div style={{ color: T.white, fontWeight: 900, fontSize: 18, marginTop: 4 }}>{patient?.name || "Alex Johnson"}</div>
               <div style={{ color: T.gray, fontSize: 12, marginTop: 2 }}>Apr 22, 2026 · Session 12</div>
             </div>

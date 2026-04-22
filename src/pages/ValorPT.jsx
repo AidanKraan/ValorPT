@@ -16,6 +16,7 @@ import ProgressDashboard from "../components/ProgressDashboard";
 import ExerciseFigure from "../components/ExerciseFigure";
 import WelcomeScreen from "../components/WelcomeScreen";
 import ExerciseSession from "../components/ExerciseSession";
+import CameraErrorBoundary from "../components/CameraErrorBoundary";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1222,6 +1223,61 @@ export default function ValorPT() {
   const [showDebrief, setShowDebrief] = useState(false);
   const [showReport, setShowReport] = useState(false);
 
+  /* Screen history for Escape → go-back */
+  const screenHistoryRef = useRef([]);
+  useEffect(() => {
+    const hist = screenHistoryRef.current;
+    if (hist[hist.length - 1] !== screen) hist.push(screen);
+    if (hist.length > 20) hist.shift();
+  }, [screen]);
+
+  /* Demo-mode keyboard shortcuts */
+  useEffect(() => {
+    const buildDemoExercise = () => {
+      const name = "Straight Leg Raises";
+      const d = EXERCISE_DB[name] || {};
+      return { name, phase: d.phase, sets: d.sets, metric: d.metric, muscles: d.muscles };
+    };
+    const onKey = (e) => {
+      const tag = e.target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.target?.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+
+      if (k === "d") {
+        setPatient({ ...SAMPLE_PATIENT });
+        setExercise(null);
+        setDetailExercise(null);
+        setScreen("dashboard");
+        setNav("home");
+      } else if (k === "r") {
+        const ex = buildDemoExercise();
+        setExercise(ex);
+        setScreen("session");
+        setNav("record");
+      } else if (k === "a") {
+        const ex = buildDemoExercise();
+        setExercise(ex);
+        if (!result) setResult({ exercise: ex, m: { knee: 108, sym: 87, reps: 15 } });
+        setShowDebrief(true);
+      } else if (k === "p") {
+        setScreen("progress");
+        setNav("progress");
+      } else if (e.key === "Escape") {
+        if (showReport) { setShowReport(false); return; }
+        if (showDebrief) { setShowDebrief(false); return; }
+        if (showCelebration) { setShowCelebration(false); return; }
+        if (detailExercise) { setDetailExercise(null); return; }
+        const hist = screenHistoryRef.current;
+        hist.pop();
+        const prev = hist[hist.length - 1];
+        if (prev && prev !== screen) setScreen(prev);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showReport, showDebrief, showCelebration, detailExercise, screen, result]);
+
   const handleNav = (tab) => {
     setNav(tab);
     setDetailExercise(null);
@@ -1254,7 +1310,11 @@ export default function ValorPT() {
     switch (screen) {
       case "login":    return <WelcomeScreen onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
       case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
-      case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")} />;
+      case "session":  return (
+        <CameraErrorBoundary onBack={() => setScreen("dashboard")}>
+          <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")} />
+        </CameraErrorBoundary>
+      );
       case "results":  return <div className="slide-in-right"><SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/></div>;
       case "progress": return <div className="slide-in-right"><ProgressDashboard patient={patient} onViewReport={() => setShowReport(true)}/></div>;
       default: return null;

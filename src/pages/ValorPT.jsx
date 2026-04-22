@@ -103,6 +103,10 @@ const GLOBAL_CSS = `
     100% { transform: scale(1); opacity: 1; }
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slideInLeft  { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .slide-in-right { animation: slideInRight 0.32s cubic-bezier(0.16,1,0.3,1) both; }
+  .slide-in-left  { animation: slideInLeft  0.32s cubic-bezier(0.16,1,0.3,1) both; }
   @keyframes ringFill { from { stroke-dashoffset: 502; } }
   @keyframes scrubPulse {
     0%,100% { opacity: 1; } 50% { opacity: 0.5; }
@@ -1287,10 +1291,10 @@ export default function ValorPT() {
     }
     switch (screen) {
       case "login":    return <PatientLogin onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
-      case "dashboard":return <ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/>;
-      case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/>;
-      case "results":  return <SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/>;
-      case "progress": return <ProgressDashboard patient={patient} onViewReport={() => setShowReport(true)}/>;
+      case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
+      case "session":  return <div className="slide-in-right"><ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/></div>;
+      case "results":  return <div className="slide-in-right"><SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/></div>;
+      case "progress": return <div className="slide-in-right"><ProgressDashboard patient={patient} onViewReport={() => setShowReport(true)}/></div>;
       default: return null;
     }
   };
@@ -1310,8 +1314,8 @@ export default function ValorPT() {
       <div style={{ fontFamily: font, background: T.bg, minHeight: "100vh", color: T.white, maxWidth: 480, margin: "0 auto", position: "relative", boxShadow: "0 0 100px rgba(0,0,0,0.9)", overflow: "hidden" }}>
         <AmbientBg/>
         {showCelebration && <CelebrationScreen exercise={exercise} onDone={() => { setShowCelebration(false); setShowDebrief(true); }}/>}
-        {showDebrief && <AICoachDebrief patient={patient} result={result} onDone={() => { setShowDebrief(false); setScreen("results"); }}/>}
-        {showReport && <SessionReport patient={patient} exercise={exercise} onBack={() => setShowReport(false)} />}
+        {showDebrief && <AICoachDebrief patient={patient} result={result} onDone={() => { setShowDebrief(false); setScreen("results"); }} onViewReport={() => { setShowDebrief(false); setShowReport(true); }}/>}
+        {showReport && <SessionReport patient={patient} exercise={exercise} onBack={() => setShowReport(false)} onViewProgress={() => { setShowReport(false); setScreen("progress"); setNav("progress"); }} />}
         <ModeToggle mode={mode} setMode={setMode}/>
         <div style={{ position: "relative", zIndex: 1 }}>
           {mode === "patient" ? (

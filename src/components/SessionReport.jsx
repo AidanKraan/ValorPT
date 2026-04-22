@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   ChevronLeft, Download, Share2, TrendingUp, TrendingDown,
-  Calendar, Clock, FileText, Play, Award, Target
+  Calendar, Clock, FileText, Play, Award, Target, BarChart2, Check, X
 } from "lucide-react";
 
 const T = {
@@ -257,7 +257,98 @@ function JointHeatmap() {
 /* ══════════════════════════════════
    MAIN SESSION REPORT
 ══════════════════════════════════ */
-export default function SessionReport({ patient, exercise, onBack }) {
+/* ── Share Modal ── */
+function ShareModal({ patient, onClose }) {
+  const [sent, setSent] = useState(false);
+
+  const handleSend = () => {
+    setSent(true);
+    setTimeout(onClose, 1800);
+  };
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 800,
+      background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)",
+      display: "flex", alignItems: "flex-end", justifyContent: "center",
+      animation: "fadeIn 0.2s ease",
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 480,
+        background: "#111", borderRadius: "24px 24px 0 0",
+        border: `1px solid rgba(255,255,255,0.1)`, borderBottom: "none",
+        padding: "24px 20px 40px",
+        animation: "slideUp 0.3s cubic-bezier(0.16,1,0.3,1)",
+      }}>
+        <style>{`
+          @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+          @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+        `}</style>
+
+        {/* Handle */}
+        <div style={{ width: 40, height: 4, borderRadius: 99, background: "#333", margin: "0 auto 20px" }} />
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div style={{ fontWeight: 800, fontSize: 18, color: T.white }}>Share Report</div>
+          <button onClick={onClose} style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: T.gray }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Report preview card */}
+        <div style={{
+          background: "linear-gradient(135deg, #0D2818, #111)",
+          border: `1px solid ${T.greenBorder}`, borderRadius: 16, padding: "16px",
+          marginBottom: 20, boxShadow: `0 0 24px ${T.greenGlow}`,
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+            <div>
+              <div style={{ color: T.green, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>ValorPT · Session Report</div>
+              <div style={{ color: T.white, fontWeight: 900, fontSize: 18, marginTop: 4 }}>{patient?.name || "Alex Johnson"}</div>
+              <div style={{ color: T.gray, fontSize: 12, marginTop: 2 }}>Apr 22, 2026 · Session 12</div>
+            </div>
+            <div style={{ background: T.greenDim, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+              <div style={{ color: T.green, fontWeight: 900, fontSize: 22, lineHeight: 1 }}>87</div>
+              <div style={{ color: T.gray, fontSize: 9, textTransform: "uppercase", marginTop: 2 }}>Score</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            {[{ label: "Peak ROM", val: "112°" }, { label: "Symmetry", val: "91%" }, { label: "Reps", val: "15" }].map(s => (
+              <div key={s.label} style={{ background: "rgba(0,200,83,0.08)", borderRadius: 8, padding: "8px 6px", textAlign: "center" }}>
+                <div style={{ color: T.green, fontWeight: 900, fontSize: 16 }}>{s.val}</div>
+                <div style={{ color: T.gray, fontSize: 9, marginTop: 2 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Send to PT button */}
+        {sent ? (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            background: T.greenDim, border: `1px solid ${T.greenBorder}`, borderRadius: 14,
+            padding: "16px", color: T.green, fontWeight: 800, fontSize: 16,
+          }}>
+            <Check size={22} /> Sent to Dr. Paternite!
+          </div>
+        ) : (
+          <button onClick={handleSend} style={{
+            width: "100%", background: `linear-gradient(135deg, ${T.green}, ${T.greenDeep})`,
+            border: "none", borderRadius: 14, padding: "16px 0", cursor: "pointer",
+            fontFamily: font, fontWeight: 800, fontSize: 16, color: "#fff",
+            boxShadow: `0 4px 20px ${T.greenGlow}`,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+          }}>
+            <Share2 size={20} /> Send to Dr. Paternite
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function SessionReport({ patient, exercise, onBack, onViewProgress }) {
+  const [showShare, setShowShare] = useState(false);
   const patientName = patient?.name?.split(" ")[0] || "Alex";
 
   const repData = [
@@ -274,7 +365,10 @@ export default function SessionReport({ patient, exercise, onBack }) {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, color: T.white, fontFamily: font, paddingBottom: 100 }}>
+    <>
+    {showShare && <ShareModal patient={patient} onClose={() => setShowShare(false)} />}
+    <div style={{ minHeight: "100vh", background: T.bg, color: T.white, fontFamily: font, paddingBottom: 100, animation: "slideInRight 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
+    <style>{`@keyframes slideInRight { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }`}</style>
 
       {/* ── Header ── */}
       <div style={{
@@ -318,7 +412,7 @@ export default function SessionReport({ patient, exercise, onBack }) {
           }}>
             <Download size={15} /> Export PDF
           </button>
-          <button style={{
+          <button onClick={() => setShowShare(true)} style={{
             flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
             background: "transparent", border: `1.5px solid ${T.green}`,
             borderRadius: 10, padding: "10px 0", cursor: "pointer",
@@ -439,8 +533,21 @@ export default function SessionReport({ patient, exercise, onBack }) {
           </div>
         </div>
 
+        {/* ── View All Progress ── */}
+        {onViewProgress && (
+          <button onClick={onViewProgress} style={{
+            width: "100%", background: T.glass, backdropFilter: "blur(20px)",
+            border: `1px solid ${T.glassBorder}`, borderRadius: 14, padding: "14px 0",
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            fontFamily: font, fontWeight: 700, fontSize: 14, color: T.gray,
+          }}>
+            <BarChart2 size={16} /> View All Progress Analytics
+          </button>
+        )}
+
       </div>
     </div>
+    </>
   );
 }
 

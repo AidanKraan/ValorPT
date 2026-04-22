@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, Send, TrendingUp, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Send, TrendingUp, FileText } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const T = {
@@ -234,7 +234,7 @@ function TypewriterBubble({ text, onDone, showAvatar = true, speed = 18 }) {
 /* ══════════════════════════════════════════════════════
    MAIN COMPONENT
 ══════════════════════════════════════════════════════ */
-export default function AICoachDebrief({ patient, result, onDone }) {
+export default function AICoachDebrief({ patient, result, onDone, onViewReport }) {
   const exerciseName = result?.exercise?.name || "Straight Leg Raises";
   const metrics = result?.m || { knee: 98, hip: 44, sym: 87, reps: 15 };
 
@@ -458,6 +458,24 @@ export default function AICoachDebrief({ patient, result, onDone }) {
           <div style={{ color: T.gray, fontSize: 12, textAlign: "center" }}>
             Analyzing your session data...
           </div>
+        </div>
+      )}
+
+      {/* View Full Report CTA — appears when debrief is complete */}
+      {inputReady && onViewReport && (
+        <div style={{ padding: "0 16px 12px", flexShrink: 0, background: "rgba(8,8,8,0.97)" }}>
+          <button
+            onClick={onViewReport}
+            style={{
+              width: "100%", background: `linear-gradient(135deg, ${T.green}, ${T.greenDeep})`,
+              border: "none", borderRadius: 14, padding: "14px 0", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              fontFamily: font, fontWeight: 800, fontSize: 15, color: "#fff",
+              boxShadow: `0 4px 20px ${T.greenGlow}`,
+            }}
+          >
+            <FileText size={18} /> View Full Session Report
+          </button>
         </div>
       )}
     </div>

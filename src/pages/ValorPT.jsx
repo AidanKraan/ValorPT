@@ -1276,7 +1276,7 @@ export default function ValorPT() {
             patient={patient}
             exercise={exercise}
             onComplete={r => { setResult(r); setShowCelebration(true); }}
-            onViewReport={r => { setResult(r); setScreen("results"); setShowDebrief(true); }}
+            onSessionComplete={r => { setResult(r); setScreen("results"); setShowDebrief(true); }}
             onBack={() => setScreen("dashboard")}
           />
         </CameraErrorBoundary>

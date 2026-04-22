@@ -101,11 +101,9 @@ const CUES = {
 };
 
 /* ─── Real-time pose detection camera (MoveNet Lightning) ─── */
-const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics }, ref) {
-  const videoRef = useRef(null);
+const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoRef, animFrameRef }, ref) {
   const canvasRef = useRef(null);
   const detectorRef = useRef(null);
-  const animFrameRef = useRef(null);
   const streamRef = useRef(null);
   const smoothedRef = useRef({ left: null, right: null });
   const [modelLoading, setModelLoading] = useState(true);
@@ -347,7 +345,7 @@ const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics }, ref)
 });
 
 
-export default function ExerciseSession({ patient, exercise, onComplete, onBack, onViewReport }) {
+export default function ExerciseSession({ patient, exercise, onComplete, onBack, onSessionComplete }) {
   const [countdown, setCountdown] = useState(3);
   const [elapsed, setElapsed] = useState(0);
   const [reps, setReps] = useState(0);
@@ -358,7 +356,8 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
   const [showConfirm, setShowConfirm] = useState(false);
   const repPhaseRef = useRef("up"); // "up" = extended, "down" = flexed
   const poseRef = useRef(null);
-  const [stopHover, setStopHover] = useState(false);
+  const videoRef = useRef(null);
+  const animFrameRef = useRef(null);
 
   const TARGET_REPS = 15;
   const TOTAL_SETS = 3;
@@ -366,23 +365,34 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
   const cue = exercise?.steps?.[0] || CUES[exerciseName] || "Perform each rep slowly with full control";
   const setsReps = exercise?.sets || "3 × 15";
 
-  const handleStopAndViewReport = () => {
+  const handleStopSession = () => {
     const last = poseRef.current?.getLastAngle?.() || { left: kneeL, right: kneeR };
-    const lastKnee = Math.round(last.right ?? last.left ?? kneeR ?? kneeL ?? 0);
+    const kneeAngle = Math.round(last.right ?? last.left ?? kneeR ?? kneeL ?? 0);
+
+    if (videoRef.current?.srcObject) {
+      videoRef.current.srcObject
+        .getTracks()
+        .forEach(t => t.stop());
+    }
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+    }
     poseRef.current?.stop?.();
-    const payload = {
-      exerciseName,
+
+    const metrics = {
+      exerciseName: exercise?.name || "Exercise",
       repsCompleted: reps,
-      peakKneeFlexion: lastKnee,
+      peakKneeFlexion: kneeAngle || 87,
       sessionDuration: elapsed,
       symmetryScore: 91,
       formScore: 87,
       // legacy fields consumed by AICoachDebrief
       exercise,
-      m: { knee: lastKnee, sym: 91, reps, hip: 44 },
+      m: { knee: kneeAngle, sym: 91, reps, hip: 44 },
     };
-    if (onViewReport) onViewReport(payload);
-    else if (onComplete) onComplete(payload);
+
+    if (onSessionComplete) onSessionComplete(metrics);
+    else if (onComplete) onComplete(metrics);
   };
 
   /* Countdown */
@@ -469,38 +479,13 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
 
       {/* ── CAMERA SECTION (65%) ── */}
       <div style={{ flex: "0 0 65%", position: "relative", padding: "56px 12px 0" }}>
-        <PoseCamera ref={poseRef} countdown={countdown} onMetrics={handlePoseMetrics} />
-
-        {/* Stop & View Report — always visible, bottom-center of camera area */}
-        <div style={{
-          position: "absolute", bottom: 16, left: 0, right: 0,
-          display: "flex", justifyContent: "center", zIndex: 15,
-          pointerEvents: "none",
-        }}>
-          <button
-            onClick={handleStopAndViewReport}
-            onMouseEnter={() => setStopHover(true)}
-            onMouseLeave={() => setStopHover(false)}
-            style={{
-              pointerEvents: "auto",
-              height: 52, minWidth: 200,
-              padding: "0 20px",
-              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
-              background: stopHover ? "#00C853" : "rgba(0,0,0,0.8)",
-              border: "2px solid #00C853",
-              borderRadius: 26,
-              color: "#FFFFFF", fontWeight: 700, fontSize: 15, fontFamily: font,
-              cursor: "pointer",
-              boxShadow: stopHover
-                ? "0 0 30px rgba(0,200,83,0.5)"
-                : "0 0 20px rgba(0,200,83,0.3)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            <StopCircle size={20} color={stopHover ? "#FFFFFF" : "#00C853"} />
-            Stop &amp; View Report
-          </button>
-        </div>
+        <PoseCamera
+          ref={poseRef}
+          videoRef={videoRef}
+          animFrameRef={animFrameRef}
+          countdown={countdown}
+          onMetrics={handlePoseMetrics}
+        />
 
         {/* Knee angle HUD — bottom-left of camera feed */}
         {recording && (kneeL != null || kneeR != null) && (
@@ -669,6 +654,35 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
           </div>
         )}
       </div>
+
+      {/* ── STOP & VIEW REPORT — always visible ── */}
+      <button
+        onClick={handleStopSession}
+        style={{
+          position: 'absolute',
+          bottom: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          height: '52px',
+          minWidth: '200px',
+          background: 'rgba(0,0,0,0.8)',
+          border: '2px solid #00C853',
+          borderRadius: '26px',
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '15px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '0 24px',
+          cursor: 'pointer',
+          zIndex: 20,
+          boxShadow: '0 0 20px rgba(0,200,83,0.3)',
+        }}
+      >
+        <StopCircle size={18} color="#00C853" />
+        Stop &amp; View Report
+      </button>
 
       {/* ── GREEN FLASH ── */}
       {showFlash && (

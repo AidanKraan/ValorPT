@@ -15,6 +15,7 @@ import SessionReport from "../components/SessionReport";
 import ProgressDashboard from "../components/ProgressDashboard";
 import ExerciseFigure from "../components/ExerciseFigure";
 import WelcomeScreen from "../components/WelcomeScreen";
+import ExerciseSession from "../components/ExerciseSession";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1070,47 +1071,6 @@ function ProgramDashboard({ patient, onStartSession, onViewDetail }) {
   );
 }
 
-function ExerciseSession({ patient, exercise, onComplete, onBack }) {
-  const m = useMetrics(patient.phase);
-  const [sets, setSets] = useState(0);
-  const totalSets = 3;
-  const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-  const INSTRS = { "Lying Heel Slides":"Lie flat. Slowly slide heel toward buttocks as far as comfortable. Hold 2s, return slowly.","Seated Heel Slides":"Sit in chair. Slide heel under chair bending knee maximally. Hold 2s at peak.","Straight Leg Raises":"Tighten quad, raise leg to 45°. Hold 2s. Lower slowly with full control.","Long Arc Quad":"Sit at surface edge. Fully straighten leg, hold 5s, lower slowly.","Air Squats (60°)":"Stand shoulder-width. Lower to 60° knee flexion. Control descent and ascent.","Air Squats (30°)":"Stand shoulder-width. Lower to 30° knee flexion only. Focus on symmetry.","Single Leg Squat 50%":"Stand on operative leg. Lower to half squat, knee over 2nd toe.","Single Leg Squat Max":"Stand on operative leg. Lower as deep as comfortable maintaining alignment.","Step-Ups":"Step up leading with operative leg. Straighten fully at top.","Forward Lunges":"Step forward, lower back knee toward floor. Drive through heel back to start." };
-  const instr = INSTRS[exercise?.name] || "Perform movement slowly and with full control.";
-  return (
-    <div className="fadeUp" style={{minHeight:"100vh",background:T.bg,color:T.white,paddingBottom:90}}>
-      <div style={{background:"linear-gradient(180deg, #0D2818 0%, transparent 100%)",padding:"14px 18px",display:"flex",alignItems:"center",gap:12,position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",top:-20,right:-20,width:140,height:140,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.2) 0%, transparent 70%)",pointerEvents:"none"}}/>
-        <button onClick={onBack} className="btn-press" style={{background:T.grayD,border:`1px solid ${T.border}`,borderRadius:99,padding:"8px 12px",color:T.gray,cursor:"pointer",display:"flex",alignItems:"center"}}><ChevronLeft size={18}/></button>
-        <div style={{flex:1,position:"relative"}}>
-          <div style={{fontWeight:800,fontSize:16,letterSpacing:-0.3}}>{exercise?.name}</div>
-          <div style={{color:T.green,fontSize:12,marginTop:1}}>Phase {patient.phase} · Set {sets+1} of {totalSets}</div>
-        </div>
-        <div style={{background:T.grayD,border:`1px solid ${T.border}`,borderRadius:12,padding:"8px 14px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
-          <Timer size={12} color={T.gray}/>
-          <div style={{color:T.green,fontWeight:900,fontSize:18,fontVariantNumeric:"tabular-nums"}}>{fmt(m.t)}</div>
-        </div>
-      </div>
-      <div style={{padding:"14px 16px",display:"flex",flexDirection:"column",gap:12}}>
-        <WebcamFeed kneeAngle={m.knee}/>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-          {[{label:"Knee Flexion",val:m.knee,unit:"°",color:T.orange,Icon:Bone},{label:"Hip Flexion",val:m.hip,unit:"°",color:T.green,Icon:Activity},{label:"Symmetry",val:m.sym,unit:"%",color:m.sym>=80?T.green:T.red,Icon:Target},{label:"Reps",val:m.reps,unit:"",color:T.white,Icon:Zap}].map(mc=>(
-            <Card key={mc.label} style={{padding:"14px 16px",textAlign:"center"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,marginBottom:5,color:T.gray}}><mc.Icon size={13}/><span style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,fontWeight:600}}>{mc.label}</span></div>
-              <div style={{color:mc.color,fontSize:42,fontWeight:900,fontVariantNumeric:"tabular-nums",lineHeight:1,letterSpacing:-1}}><AnimNum value={mc.val} suffix={mc.unit}/></div>
-            </Card>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:8,justifyContent:"center"}}>{Array.from({length:totalSets}).map((_,i)=><div key={i} style={{width:10,height:10,borderRadius:"50%",background:i<=sets?T.green:T.grayD,boxShadow:i<=sets?`0 0 6px ${T.green}`:"none"}}/>)}</div>
-        <Card style={{padding:"14px 18px"}}><div style={{display:"flex",gap:10,alignItems:"flex-start"}}><Info size={16} color={T.green} style={{flexShrink:0,marginTop:1}}/><p style={{color:T.gray,fontSize:13,lineHeight:1.6}}>{instr}</p></div></Card>
-        <Btn onClick={()=>{if(sets<totalSets-1)setSets(s=>s+1);else onComplete({m,exercise});}} style={{width:"100%",fontSize:16}} icon={sets<totalSets-1?Check:ArrowRight}>
-          {sets<totalSets-1?`Complete Set ${sets+1}`:"Finish Exercise"}
-        </Btn>
-      </div>
-    </div>
-  );
-}
-
 function SessionResults({ result, onNext, onEnd, onViewReport }) {
   const repData=[22,44,72,90,100,107,104,102,108,106,104,108,107,108,108];
   const W=340,H=100,pad={t:8,b:16,l:24,r:8},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b,mn=0,mx=130;
@@ -1294,7 +1254,7 @@ export default function ValorPT() {
     switch (screen) {
       case "login":    return <WelcomeScreen onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
       case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
-      case "session":  return <div className="slide-in-right"><ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/></div>;
+      case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")} />;
       case "results":  return <div className="slide-in-right"><SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/></div>;
       case "progress": return <div className="slide-in-right"><ProgressDashboard patient={patient} onViewReport={() => setShowReport(true)}/></div>;
       default: return null;

@@ -1,4 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  Home, ClipboardList, Circle, TrendingUp, User,
+  CheckCircle, Play, Activity, Calendar, AlertTriangle,
+  ChevronRight, ArrowRight, Search, Info, Camera,
+  Flag, Plus, ChevronLeft, Zap, Target, Timer,
+  BarChart2, Users, MessageSquare, Settings,
+  Award, Flame, Star, Layers, Footprints,
+  PersonStanding, Dumbbell, MoveUp, Repeat,
+  Shield, Clock, Check, TrendingDown, Heart,
+  LayoutDashboard, Stethoscope, Bone
+} from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -21,7 +32,6 @@ const T = {
   border:      "rgba(255,255,255,0.08)",
   red:         "#FF3B30",
   orange:      "#FF9500",
-  charcoal:    "#2D3748",
 };
 
 const font = `'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif`;
@@ -92,16 +102,7 @@ const GLOBAL_CSS = `
     100% { transform: scale(1); opacity: 1; }
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
-  }
-  @keyframes countUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes ringFill {
-    from { stroke-dashoffset: 502; }
-  }
+  @keyframes ringFill { from { stroke-dashoffset: 502; } }
 
   .fadeUp  { animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
   .fadeUp2 { animation: fadeUp 0.5s 0.07s cubic-bezier(0.16,1,0.3,1) both; }
@@ -110,9 +111,7 @@ const GLOBAL_CSS = `
   .fadeUp5 { animation: fadeUp 0.5s 0.28s cubic-bezier(0.16,1,0.3,1) both; }
 
   .card-hover {
-    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
-                box-shadow 0.25s ease,
-                border-color 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease, border-color 0.25s ease;
   }
   .card-hover:hover {
     transform: translateY(-3px);
@@ -126,12 +125,11 @@ const GLOBAL_CSS = `
 `;
 
 /* ═══════════════════════════════════════════════════════════════
-   VALOR PT LOGO — faithfully recreated from the actual brand
+   VALOR PT SVG LOGO
 ═══════════════════════════════════════════════════════════════ */
 function ValorIcon({ size = 48 }) {
-  const s = size;
   return (
-    <svg width={s} height={s} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="vi_g1" x1="50" y1="5" x2="50" y2="95" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#8BC34A"/>
@@ -143,46 +141,29 @@ function ValorIcon({ size = 48 }) {
           <stop offset="100%" stopColor="#2E7D32"/>
         </linearGradient>
       </defs>
-      {/* Head circle */}
       <circle cx="54" cy="14" r="9" fill="url(#vi_g2)"/>
-      {/* Left wing / leaf — upper-left arm raised */}
-      <path d="M50 22 C38 18, 14 28, 8 48 C16 38, 30 32, 44 36 Z"
-        fill="url(#vi_g1)" opacity="0.95"/>
-      {/* Left wing — lower leaf */}
-      <path d="M46 36 C34 38, 16 52, 18 68 C24 56, 36 46, 50 48 Z"
-        fill="url(#vi_g1)" opacity="0.85"/>
-      {/* Right checkmark swoosh — the big V/check going down-right then up-right */}
-      <path d="M32 55 C36 62, 44 72, 52 78 C60 64, 72 44, 88 28"
-        stroke="url(#vi_g1)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      {/* Right arm raised — top of checkmark continues up */}
-      <path d="M52 78 C58 68, 72 44, 90 26"
-        stroke="url(#vi_g2)" strokeWidth="12" strokeLinecap="round" fill="none" opacity="0.9"/>
+      <path d="M50 22 C38 18, 14 28, 8 48 C16 38, 30 32, 44 36 Z" fill="url(#vi_g1)" opacity="0.95"/>
+      <path d="M46 36 C34 38, 16 52, 18 68 C24 56, 36 46, 50 48 Z" fill="url(#vi_g1)" opacity="0.85"/>
+      <path d="M32 55 C36 62, 44 72, 52 78 C60 64, 72 44, 88 28" stroke="url(#vi_g1)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      <path d="M52 78 C58 68, 72 44, 90 26" stroke="url(#vi_g2)" strokeWidth="12" strokeLinecap="round" fill="none" opacity="0.9"/>
     </svg>
   );
 }
 
-/* Full logo: icon + wordmark */
 function ValorLogo({ size = 40, showText = true }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: size * 0.25 }}>
       <ValorIcon size={size}/>
       {showText && (
         <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-          <span style={{
-            fontFamily: font, fontWeight: 900, fontSize: size * 0.52,
-            color: T.white, letterSpacing: -0.5, lineHeight: 1,
-          }}>VALOR</span>
-          <span style={{
-            fontFamily: font, fontWeight: 900, fontSize: size * 0.52,
-            color: T.green, letterSpacing: -0.5, lineHeight: 1,
-          }}>PT</span>
+          <span style={{ fontFamily: font, fontWeight: 900, fontSize: size * 0.52, color: T.white, letterSpacing: -0.5, lineHeight: 1 }}>VALOR</span>
+          <span style={{ fontFamily: font, fontWeight: 900, fontSize: size * 0.52, color: T.green, letterSpacing: -0.5, lineHeight: 1 }}>PT</span>
         </div>
       )}
     </div>
   );
 }
 
-/* Watermark version for hero backgrounds */
 function ValorWatermark({ size = 200 }) {
   return (
     <div style={{ opacity: 0.06, pointerEvents: "none" }}>
@@ -197,24 +178,9 @@ function ValorWatermark({ size = 200 }) {
 function AmbientBg() {
   return (
     <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-      <div style={{
-        position: "absolute", width: "70%", height: "70%", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,200,83,0.055) 0%, transparent 65%)",
-        top: "-15%", left: "20%",
-        animation: "ambientDrift 22s ease-in-out infinite",
-      }}/>
-      <div style={{
-        position: "absolute", width: "55%", height: "55%", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(27,94,32,0.07) 0%, transparent 65%)",
-        bottom: "5%", right: "-10%",
-        animation: "ambientDrift2 28s ease-in-out infinite",
-      }}/>
-      <div style={{
-        position: "absolute", width: "40%", height: "40%", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(0,200,83,0.04) 0%, transparent 65%)",
-        top: "50%", left: "-5%",
-        animation: "ambientDrift 35s ease-in-out infinite reverse",
-      }}/>
+      <div style={{ position: "absolute", width: "70%", height: "70%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.055) 0%, transparent 65%)", top: "-15%", left: "20%", animation: "ambientDrift 22s ease-in-out infinite" }}/>
+      <div style={{ position: "absolute", width: "55%", height: "55%", borderRadius: "50%", background: "radial-gradient(circle, rgba(27,94,32,0.07) 0%, transparent 65%)", bottom: "5%", right: "-10%", animation: "ambientDrift2 28s ease-in-out infinite" }}/>
+      <div style={{ position: "absolute", width: "40%", height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.04) 0%, transparent 65%)", top: "50%", left: "-5%", animation: "ambientDrift 35s ease-in-out infinite reverse" }}/>
     </div>
   );
 }
@@ -224,41 +190,27 @@ function AmbientBg() {
 ═══════════════════════════════════════════════════════════════ */
 function SplashScreen({ onDone }) {
   const [fading, setFading] = useState(false);
-
   useEffect(() => {
     const t1 = setTimeout(() => setFading(true), 1400);
     const t2 = setTimeout(onDone, 1900);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
-
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 9999,
-      background: "#000",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      flexDirection: "column", gap: 24,
-      animation: fading ? "splashFadeOut 0.5s ease forwards" : "splashFadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards",
-    }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 24, animation: fading ? "splashFadeOut 0.5s ease forwards" : "splashFadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
       <div style={{ animation: "scaleIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
-        <ValorLogo size={90} showText={false}/>
+        <ValorIcon size={90}/>
       </div>
-      <div style={{ animation: "fadeUp 0.6s 0.3s both" }}>
-        <ValorLogo size={0} showText={false}/>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginTop: 16 }}>
+      <div style={{ animation: "fadeUp 0.6s 0.3s both", textAlign: "center" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 4, marginTop: 16 }}>
           <span style={{ fontFamily: font, fontWeight: 900, fontSize: 38, color: T.white, letterSpacing: -1 }}>VALOR</span>
           <span style={{ fontFamily: font, fontWeight: 900, fontSize: 38, color: T.green, letterSpacing: -1 }}>PT</span>
         </div>
-        <p style={{ color: T.gray, fontSize: 13, textAlign: "center", marginTop: 6, letterSpacing: 2, textTransform: "uppercase" }}>
-          Clinical AI Motion Analysis
-        </p>
+        <p style={{ color: T.gray, fontSize: 13, textAlign: "center", marginTop: 6, letterSpacing: 2, textTransform: "uppercase" }}>Clinical AI Motion Analysis</p>
       </div>
-      {/* Loading ring */}
       <div style={{ animation: "fadeIn 0.4s 0.6s both" }}>
         <svg width="36" height="36" viewBox="0 0 36 36">
           <circle cx="18" cy="18" r="15" fill="none" stroke={T.grayD} strokeWidth="2.5"/>
-          <circle cx="18" cy="18" r="15" fill="none" stroke={T.green} strokeWidth="2.5"
-            strokeDasharray="94" strokeDashoffset="70" strokeLinecap="round"
-            style={{ animation: "spin 1s linear infinite", transformOrigin: "50% 50%" }}/>
+          <circle cx="18" cy="18" r="15" fill="none" stroke={T.green} strokeWidth="2.5" strokeDasharray="94" strokeDashoffset="70" strokeLinecap="round" style={{ animation: "spin 1s linear infinite", transformOrigin: "50% 50%" }}/>
         </svg>
       </div>
     </div>
@@ -266,41 +218,32 @@ function SplashScreen({ onDone }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CONFETTI
+   CONFETTI (shapes only, no emojis)
 ═══════════════════════════════════════════════════════════════ */
 function Confetti() {
-  const pieces = Array.from({ length: 28 }, (_, i) => ({
+  const pieces = Array.from({ length: 30 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     delay: Math.random() * 0.8,
     duration: 1.8 + Math.random() * 1.2,
     size: 6 + Math.random() * 8,
-    color: [T.green, "#8BC34A", "#AED581", "#00E676", "#69F0AE", "#FFFFFF22"][Math.floor(Math.random() * 6)],
+    color: [T.green, "#8BC34A", "#AED581", "#00E676", "#69F0AE", "rgba(255,255,255,0.3)"][Math.floor(Math.random() * 6)],
     shape: Math.random() > 0.5 ? "circle" : "rect",
   }));
-
   return (
     <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 10 }}>
       {pieces.map(p => (
-        <div key={p.id} style={{
-          position: "absolute", left: `${p.x}%`, top: 0,
-          width: p.size, height: p.shape === "circle" ? p.size : p.size * 0.6,
-          borderRadius: p.shape === "circle" ? "50%" : 2,
-          background: p.color,
-          animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards`,
-          opacity: 0.9,
-        }}/>
+        <div key={p.id} style={{ position: "absolute", left: `${p.x}%`, top: 0, width: p.size, height: p.shape === "circle" ? p.size : p.size * 0.6, borderRadius: p.shape === "circle" ? "50%" : 2, background: p.color, animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards` }}/>
       ))}
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CELEBRATION SCREEN (2s auto-transition)
+   CELEBRATION SCREEN
 ═══════════════════════════════════════════════════════════════ */
 function CelebrationScreen({ exercise, onDone }) {
   const [progress, setProgress] = useState(0);
-
   useEffect(() => {
     const start = Date.now();
     const tick = () => {
@@ -311,18 +254,10 @@ function CelebrationScreen({ exercise, onDone }) {
     };
     requestAnimationFrame(tick);
   }, []);
-
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 500,
-      background: T.bg, display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", gap: 24,
-      animation: "fadeIn 0.3s ease",
-    }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 500, background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 24, animation: "fadeIn 0.3s ease" }}>
       <AmbientBg/>
       <Confetti/>
-
-      {/* Checkmark circle */}
       <div style={{ animation: "celebrationScale 0.6s cubic-bezier(0.16,1,0.3,1) forwards", position: "relative", zIndex: 2 }}>
         <svg width="140" height="140" viewBox="0 0 140 140">
           <defs>
@@ -333,53 +268,33 @@ function CelebrationScreen({ exercise, onDone }) {
           </defs>
           <circle cx="70" cy="70" r="65" fill="rgba(0,200,83,0.1)" stroke="rgba(0,200,83,0.3)" strokeWidth="1"/>
           <circle cx="70" cy="70" r="55" fill="rgba(0,200,83,0.08)"/>
-          <path d="M40 70 L60 92 L100 50" stroke="url(#celebGrad)" strokeWidth="7"
-            strokeLinecap="round" strokeLinejoin="round" fill="none"
-            strokeDasharray="200" strokeDashoffset="0"
-            style={{ animation: "celebrationCheckmark 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) both" }}/>
+          <path d="M40 70 L60 92 L100 50" stroke="url(#celebGrad)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none" strokeDasharray="200" strokeDashoffset="0" style={{ animation: "celebrationCheckmark 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) both" }}/>
         </svg>
-        {/* Glow ring */}
-        <div style={{
-          position: "absolute", inset: -8, borderRadius: "50%",
-          boxShadow: `0 0 40px ${T.greenGlow}, 0 0 80px rgba(0,200,83,0.12)`,
-          pointerEvents: "none",
-        }}/>
+        <div style={{ position: "absolute", inset: -8, borderRadius: "50%", boxShadow: `0 0 40px ${T.greenGlow}, 0 0 80px rgba(0,200,83,0.12)`, pointerEvents: "none" }}/>
       </div>
-
       <div style={{ textAlign: "center", animation: "fadeUp 0.5s 0.4s both", position: "relative", zIndex: 2 }}>
-        <ValorLogo size={56} showText={false}/>
-        <h2 style={{ fontFamily: font, fontWeight: 900, fontSize: 34, color: T.white, marginTop: 16, letterSpacing: -0.8 }}>
-          Great Work!
-        </h2>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <ValorLogo size={56} showText={false}/>
+        </div>
+        <h2 style={{ fontFamily: font, fontWeight: 900, fontSize: 34, color: T.white, marginTop: 16, letterSpacing: -0.8 }}>Great Work!</h2>
         <p style={{ color: T.gray, fontSize: 15, marginTop: 6 }}>{exercise?.name}</p>
       </div>
-
-      {/* Stats */}
       <div style={{ display: "flex", gap: 16, animation: "fadeUp 0.5s 0.5s both", position: "relative", zIndex: 2 }}>
         {[
-          { label: "Peak ROM", val: "108°" },
+          { label: "Peak ROM",  val: "108°" },
           { label: "Symmetry", val: "87%" },
-          { label: "Reps", val: "15" },
+          { label: "Reps",     val: "15" },
         ].map(s => (
-          <div key={s.label} style={{
-            background: T.glass, backdropFilter: "blur(20px)",
-            border: `1px solid ${T.greenBorder}`,
-            borderRadius: 14, padding: "14px 20px", textAlign: "center",
-            boxShadow: `0 0 20px ${T.greenGlow}`,
-          }}>
+          <div key={s.label} style={{ background: T.glass, backdropFilter: "blur(20px)", border: `1px solid ${T.greenBorder}`, borderRadius: 14, padding: "14px 20px", textAlign: "center", boxShadow: `0 0 20px ${T.greenGlow}` }}>
             <div style={{ color: T.green, fontWeight: 900, fontSize: 24, fontVariantNumeric: "tabular-nums" }}>{s.val}</div>
             <div style={{ color: T.gray, fontSize: 11, marginTop: 3 }}>{s.label}</div>
           </div>
         ))}
       </div>
-
-      {/* Progress bar */}
       <div style={{ width: 160, height: 3, background: T.grayD, borderRadius: 99, overflow: "hidden", animation: "fadeIn 0.5s 0.6s both", position: "relative", zIndex: 2 }}>
         <div style={{ height: "100%", width: `${progress * 100}%`, background: T.green, borderRadius: 99, transition: "width 0.1s linear" }}/>
       </div>
-      <div style={{ color: T.gray, fontSize: 12, animation: "fadeIn 0.5s 0.7s both", position: "relative", zIndex: 2 }}>
-        Loading results…
-      </div>
+      <p style={{ color: T.gray, fontSize: 12, animation: "fadeIn 0.5s 0.7s both", position: "relative", zIndex: 2 }}>Loading results…</p>
     </div>
   );
 }
@@ -387,21 +302,15 @@ function CelebrationScreen({ exercise, onDone }) {
 /* ═══════════════════════════════════════════════════════════════
    CIRCULAR PROGRESS RING
 ═══════════════════════════════════════════════════════════════ */
-function ProgressRing({ value, max = 100, size = 80, strokeWidth = 6, color = T.green, label, sublabel, animate = true }) {
+function ProgressRing({ value, max = 100, size = 80, strokeWidth = 6, color = T.green, label, sublabel }) {
   const r = (size - strokeWidth * 2) / 2;
   const circ = 2 * Math.PI * r;
-  const pct = Math.min(value / max, 1);
-  const offset = circ * (1 - pct);
+  const offset = circ * (1 - Math.min(value / max, 1));
   return (
     <div style={{ position: "relative", width: size, height: size, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
       <svg width={size} height={size} style={{ transform: "rotate(-90deg)", position: "absolute" }}>
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={T.grayD} strokeWidth={strokeWidth}/>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={strokeWidth}
-          strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
-          style={{
-            transition: animate ? "stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)" : "none",
-            filter: `drop-shadow(0 0 8px ${color}90)`,
-          }}/>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={strokeWidth} strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)", filter: `drop-shadow(0 0 8px ${color}90)` }}/>
       </svg>
       <div style={{ textAlign: "center", zIndex: 1 }}>
         {label && <div style={{ color, fontWeight: 900, fontSize: size > 90 ? 22 : 15, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{label}</div>}
@@ -460,7 +369,7 @@ function Chart({ data, color = T.green, height = 120, label = "c", minVal, maxVa
           <stop offset="100%" stopColor={color} stopOpacity="0.01"/>
         </linearGradient>
       </defs>
-      {[0,0.25,0.5,0.75,1].map((f, i) => {
+      {[0, 0.25, 0.5, 0.75, 1].map((f, i) => {
         const y = pad.t + f * ch;
         const v = Math.round(mx - f * (mx - mn));
         return <g key={i}>
@@ -473,8 +382,7 @@ function Chart({ data, color = T.green, height = 120, label = "c", minVal, maxVa
         return <text key={i} x={pts[i].x} y={H-3} textAnchor="middle" fill={T.gray} fontSize="9" fontFamily={font}>W{Math.ceil((i+1)*6/data.length)}</text>;
       })}
       <path d={area} fill={`url(#${gid})`}/>
-      <path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-        style={{ filter: `drop-shadow(0 0 5px ${color}70)` }}/>
+      <path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 5px ${color}70)` }}/>
       {pts.map((pt, i) => (
         <g key={i}>
           <circle cx={pt.x} cy={pt.y} r="4.5" fill={color} style={{ filter: `drop-shadow(0 0 4px ${color})` }}/>
@@ -508,8 +416,7 @@ function Card({ children, style = {}, glow = false, hover = false, onClick }) {
 /* ═══════════════════════════════════════════════════════════════
    BUTTON
 ═══════════════════════════════════════════════════════════════ */
-function Btn({ children, onClick, variant = "primary", style = {}, disabled = false, icon }) {
-  const Icon = icon ? ICONS[icon] : null;
+function Btn({ children, onClick, variant = "primary", style = {}, disabled = false, icon: IconCmp }) {
   const base = {
     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
     minHeight: 50, padding: "0 26px", borderRadius: 99,
@@ -526,90 +433,19 @@ function Btn({ children, onClick, variant = "primary", style = {}, disabled = fa
   };
   return (
     <button className="btn-press" style={{ ...base, ...V[variant], ...style }} onClick={onClick} disabled={disabled}>
-      {Icon && <Icon size={18}/>}
+      {IconCmp && <IconCmp size={18}/>}
       {children}
     </button>
   );
 }
 
-/* Simple inline icons */
-const ICONS = {
-  arrow:    ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-  check:    ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-  play:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>,
-  back:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>,
-  chevron:  ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
-  plus:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-  flag:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>,
-  search:   ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-  info:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
-  alert:    ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-  camera:   ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>,
-  calendar: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-  home:     ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>,
-  program:  ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>,
-  chart:    ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  person:   ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
-  record:   ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>,
-  patients: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>,
-  analytics:({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>,
-  messages: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>,
-  settings: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
-  zap:      ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-  target:   ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
-  activity: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  timer:    ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  trending: ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
-};
-const I = ({ name, size = 20, color = T.gray }) => {
-  const Cmp = ICONS[name];
-  return Cmp ? <span style={{ color, display: "inline-flex", flexShrink: 0 }}><Cmp size={size}/></span> : null;
-};
-
 /* ═══════════════════════════════════════════════════════════════
-   SAMPLE DATA
+   HERO HEADER
 ═══════════════════════════════════════════════════════════════ */
-const SAMPLE_PATIENT = { id: 1, name: "Alex Johnson", week: 3, phase: 1, surgeryDate: "2026-04-01", compliance: 87, lastSession: "Apr 20", flagged: false };
-
-const CLINICIAN_PATIENTS = [
-  { id: 1, name: "Alex Johnson",  phase: 1, week: 3, lastSession: "Apr 20", compliance: 87, flagged: false },
-  { id: 2, name: "Maria Santos",  phase: 2, week: 5, lastSession: "Apr 19", compliance: 72, flagged: true },
-  { id: 3, name: "Derek Okafor",  phase: 1, week: 2, lastSession: "Apr 21", compliance: 95, flagged: false },
-  { id: 4, name: "Priya Nair",    phase: 2, week: 6, lastSession: "Apr 18", compliance: 61, flagged: true },
-];
-
-const PHASE1_EXERCISES = [
-  { id: 1, name: "Lying Heel Slides",    sets: "3 × 15", metric: "ROM (°)",             phase: 1, done: true,  emoji: "🦵" },
-  { id: 2, name: "Seated Heel Slides",   sets: "3 × 15", metric: "ROM (°)",             phase: 1, done: true,  emoji: "🪑" },
-  { id: 3, name: "Straight Leg Raises",  sets: "3 × 10", metric: "Symmetry (%)",        phase: 1, done: true,  emoji: "⬆️" },
-  { id: 4, name: "Long Arc Quad",        sets: "3 × 15", metric: "Peak Extension (°)",  phase: 1, done: false, emoji: "🏋️" },
-  { id: 5, name: "Air Squats (60°)",     sets: "3 × 12", metric: "Depth (°)",           phase: 1, done: false, emoji: "🏃" },
-  { id: 6, name: "Air Squats (30°)",     sets: "3 × 12", metric: "Symmetry (%)",        phase: 1, done: false, emoji: "🧘" },
-];
-
-const PHASE2_EXERCISES = [
-  { id: 7,  name: "Single Leg Squat 50%", sets: "3 × 10", metric: "Symmetry (%)",     phase: 2, done: true,  emoji: "🦿" },
-  { id: 8,  name: "Single Leg Squat Max", sets: "3 × 8",  metric: "Peak Flexion (°)", phase: 2, done: false, emoji: "💪" },
-  { id: 9,  name: "Step-Ups",             sets: "3 × 12", metric: "Hip Stability (°)",phase: 2, done: false, emoji: "🪜" },
-  { id: 10, name: "Forward Lunges",       sets: "3 × 10", metric: "Symmetry (%)",     phase: 2, done: false, emoji: "🎯" },
-];
-
-const ROM_DATA = [65, 68, 72, 76, 80, 85, 90, 95, 100, 105, 110, 113, 115];
-const SYM_DATA = [73, 75, 78, 80, 82, 84, 86, 87, 89, 90, 91, 92, 93];
-
-/* ═══════════════════════════════════════════════════════════════
-   HERO HEADER with watermark
-═══════════════════════════════════════════════════════════════ */
-function Hero({ title, subtitle, right, style = {} }) {
+function Hero({ title, subtitle, right }) {
   return (
-    <div style={{
-      background: "linear-gradient(180deg, #0D2818 0%, rgba(13,40,24,0.5) 60%, transparent 100%)",
-      padding: "24px 20px 20px", position: "relative", overflow: "hidden",
-      ...style,
-    }}>
-      {/* Glow orb */}
+    <div style={{ background: "linear-gradient(180deg, #0D2818 0%, rgba(13,40,24,0.5) 60%, transparent 100%)", padding: "24px 20px 20px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: -40, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.2) 0%, transparent 70%)", pointerEvents: "none" }}/>
-      {/* Watermark */}
       <div style={{ position: "absolute", top: -10, right: 12, pointerEvents: "none" }}>
         <ValorWatermark size={130}/>
       </div>
@@ -625,6 +461,37 @@ function Hero({ title, subtitle, right, style = {} }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SAMPLE DATA
+═══════════════════════════════════════════════════════════════ */
+const SAMPLE_PATIENT = { id: 1, name: "Alex Johnson", week: 3, phase: 1, surgeryDate: "2026-04-01", compliance: 87, lastSession: "Apr 20", flagged: false };
+
+const CLINICIAN_PATIENTS = [
+  { id: 1, name: "Alex Johnson",  phase: 1, week: 3, lastSession: "Apr 20", compliance: 87, flagged: false },
+  { id: 2, name: "Maria Santos",  phase: 2, week: 5, lastSession: "Apr 19", compliance: 72, flagged: true },
+  { id: 3, name: "Derek Okafor",  phase: 1, week: 2, lastSession: "Apr 21", compliance: 95, flagged: false },
+  { id: 4, name: "Priya Nair",    phase: 2, week: 6, lastSession: "Apr 18", compliance: 61, flagged: true },
+];
+
+const PHASE1_EXERCISES = [
+  { id: 1, name: "Lying Heel Slides",   sets: "3 × 15", metric: "ROM (°)",            phase: 1, done: true,  Icon: Activity },
+  { id: 2, name: "Seated Heel Slides",  sets: "3 × 15", metric: "ROM (°)",            phase: 1, done: true,  Icon: Activity },
+  { id: 3, name: "Straight Leg Raises", sets: "3 × 10", metric: "Symmetry (%)",       phase: 1, done: true,  Icon: MoveUp },
+  { id: 4, name: "Long Arc Quad",       sets: "3 × 15", metric: "Peak Extension (°)", phase: 1, done: false, Icon: Dumbbell },
+  { id: 5, name: "Air Squats (60°)",    sets: "3 × 12", metric: "Depth (°)",          phase: 1, done: false, Icon: Repeat },
+  { id: 6, name: "Air Squats (30°)",    sets: "3 × 12", metric: "Symmetry (%)",       phase: 1, done: false, Icon: Repeat },
+];
+
+const PHASE2_EXERCISES = [
+  { id: 7,  name: "Single Leg Squat 50%", sets: "3 × 10", metric: "Symmetry (%)",     phase: 2, done: true,  Icon: Shield },
+  { id: 8,  name: "Single Leg Squat Max", sets: "3 × 8",  metric: "Peak Flexion (°)", phase: 2, done: false, Icon: Zap },
+  { id: 9,  name: "Step-Ups",             sets: "3 × 12", metric: "Hip Stability (°)",phase: 2, done: false, Icon: Layers },
+  { id: 10, name: "Forward Lunges",       sets: "3 × 10", metric: "Symmetry (%)",     phase: 2, done: false, Icon: Target },
+];
+
+const ROM_DATA = [65, 68, 72, 76, 80, 85, 90, 95, 100, 105, 110, 113, 115];
+const SYM_DATA = [73, 75, 78, 80, 82, 84, 86, 87, 89, 90, 91, 92, 93];
+
+/* ═══════════════════════════════════════════════════════════════
    POSE CANVAS
 ═══════════════════════════════════════════════════════════════ */
 function PoseCanvas({ kneeAngle }) {
@@ -638,16 +505,11 @@ function PoseCanvas({ kneeAngle }) {
       ctx.clearRect(0, 0, W, H);
       const lift = (kneeAngle / 130) * H * 0.10;
       const j = {
-        head:   { x: W*.5,  y: H*.11 },
-        neck:   { x: W*.5,  y: H*.22 },
-        sL:     { x: W*.36, y: H*.30 },
-        sR:     { x: W*.64, y: H*.30 },
-        hipL:   { x: W*.39, y: H*.50 },
-        hipR:   { x: W*.61, y: H*.50 },
-        kneeL:  { x: W*.37, y: H*.66 - lift },
-        kneeR:  { x: W*.63, y: H*.66 - lift },
-        ankleL: { x: W*.35, y: H*.84 },
-        ankleR: { x: W*.65, y: H*.84 },
+        head:   { x: W*.5,  y: H*.11 }, neck:   { x: W*.5,  y: H*.22 },
+        sL:     { x: W*.36, y: H*.30 }, sR:     { x: W*.64, y: H*.30 },
+        hipL:   { x: W*.39, y: H*.50 }, hipR:   { x: W*.61, y: H*.50 },
+        kneeL:  { x: W*.37, y: H*.66 - lift }, kneeR:  { x: W*.63, y: H*.66 - lift },
+        ankleL: { x: W*.35, y: H*.84 }, ankleR: { x: W*.65, y: H*.84 },
       };
       const bone = (a, b) => {
         const gr = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
@@ -657,17 +519,13 @@ function PoseCanvas({ kneeAngle }) {
       };
       [["head","neck"],["neck","sL"],["neck","sR"],["sL","hipL"],["sR","hipR"],
        ["hipL","hipR"],["hipL","kneeL"],["hipR","kneeR"],["kneeL","ankleL"],["kneeR","ankleR"]]
-        .forEach(([a,b]) => bone(j[a], j[b]));
+        .forEach(([a, b]) => bone(j[a], j[b]));
       Object.entries(j).forEach(([k, pt]) => {
         const isKnee = k === "kneeL" || k === "kneeR";
-        if (isKnee) {
-          ctx.beginPath(); ctx.arc(pt.x, pt.y, 14, 0, Math.PI*2);
-          ctx.fillStyle = "rgba(255,149,0,0.18)"; ctx.fill();
-        }
+        if (isKnee) { ctx.beginPath(); ctx.arc(pt.x, pt.y, 14, 0, Math.PI*2); ctx.fillStyle = "rgba(255,149,0,0.18)"; ctx.fill(); }
         const gr = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, 10);
         gr.addColorStop(0, isKnee ? "rgba(255,149,0,0.5)" : "rgba(0,200,83,0.4)"); gr.addColorStop(1, "transparent");
-        ctx.beginPath(); ctx.arc(pt.x, pt.y, 10, 0, Math.PI*2);
-        ctx.fillStyle = gr; ctx.fill();
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 10, 0, Math.PI*2); ctx.fillStyle = gr; ctx.fill();
         ctx.beginPath(); ctx.arc(pt.x, pt.y, isKnee ? 7 : 5.5, 0, Math.PI*2);
         ctx.fillStyle = isKnee ? "#FF9500" : T.green; ctx.fill();
         ctx.strokeStyle = "rgba(255,255,255,0.6)"; ctx.lineWidth = 1.5; ctx.stroke();
@@ -701,12 +559,12 @@ function WebcamFeed({ kneeAngle }) {
     return () => stream?.getTracks().forEach(t => t.stop());
   }, []);
   return (
-    <div style={{ position: "relative", width: "100%", height: 360, borderRadius: 20, overflow: "hidden", border: `1.5px solid ${T.greenBorder}`, boxShadow: `0 0 40px ${T.greenGlow}, 0 0 0 1px rgba(0,200,83,0.1)`, background: T.surface2 }}>
+    <div style={{ position: "relative", width: "100%", height: 360, borderRadius: 20, overflow: "hidden", border: `1.5px solid ${T.greenBorder}`, boxShadow: `0 0 40px ${T.greenGlow}, 0 0 0 1px rgba(0,200,83,0.1)`, background: T.surface }}>
       {active
         ? <video ref={vidRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }}/>
         : <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-            <div style={{ padding: 16, borderRadius: 16, background: T.grayD }}><I name="camera" size={32} color={T.gray}/></div>
-            <div style={{ color: T.gray, fontSize: 13, textAlign: "center" }}>{err ? "Camera access denied\nSimulation mode active" : "Activating camera…"}</div>
+            <div style={{ padding: 16, borderRadius: 16, background: T.grayD, color: T.gray }}><Camera size={32}/></div>
+            <div style={{ color: T.gray, fontSize: 13, textAlign: "center" }}>{err ? "Camera access denied — simulation mode active" : "Activating camera…"}</div>
           </div>
       }
       <PoseCanvas kneeAngle={kneeAngle}/>
@@ -742,7 +600,7 @@ function useMetrics(phase) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   HEAT MAP (compliance calendar)
+   HEATMAP
 ═══════════════════════════════════════════════════════════════ */
 function HeatMap({ weeks = 12 }) {
   const cells = useRef(Array.from({ length: weeks * 7 }, () => { const r = Math.random(); return r > 0.35 ? (r > 0.75 ? 2 : 1) : 0; }));
@@ -752,7 +610,7 @@ function HeatMap({ weeks = 12 }) {
       {Array.from({ length: weeks }).map((_, w) => (
         <div key={w} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {Array.from({ length: 7 }).map((_, d) => (
-            <div key={d} style={{ width: 12, height: 12, borderRadius: 3, background: colors[cells.current[w * 7 + d]], boxShadow: cells.current[w*7+d] === 2 ? `0 0 4px ${T.green}70` : "none" }}/>
+            <div key={d} style={{ width: 12, height: 12, borderRadius: 3, background: colors[cells.current[w*7+d]], boxShadow: cells.current[w*7+d] === 2 ? `0 0 4px ${T.green}70` : "none" }}/>
           ))}
         </div>
       ))}
@@ -769,12 +627,8 @@ function PatientLogin({ onBegin }) {
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, position: "relative", overflow: "hidden" }}>
       <AmbientBg/>
-      {/* Large background glow */}
       <div style={{ position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 65%)", pointerEvents: "none" }}/>
-
-      {/* Logo — centered, large, with watermark behind */}
       <div className="fadeUp" style={{ textAlign: "center", marginBottom: 48, position: "relative", zIndex: 1 }}>
-        {/* Watermark */}
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", opacity: 0.06, pointerEvents: "none" }}>
           <ValorIcon size={300}/>
         </div>
@@ -787,7 +641,6 @@ function PatientLogin({ onBegin }) {
         </div>
         <p style={{ color: T.gray, fontSize: 13, marginTop: 6, letterSpacing: 2, textTransform: "uppercase" }}>Clinical AI Motion Analysis</p>
       </div>
-
       <Card className="fadeUp2" style={{ width: "100%", maxWidth: 400, padding: 32, position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 22 }}>
           <label style={{ color: T.gray, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 10 }}>Patient Name</label>
@@ -800,7 +653,7 @@ function PatientLogin({ onBegin }) {
         <div style={{ marginBottom: 32 }}>
           <label style={{ color: T.gray, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 10 }}>Rehab Phase</label>
           <div style={{ display: "flex", gap: 10 }}>
-            {[{p:1,label:"Phase 1",sub:"Weeks 1–3"},{p:2,label:"Phase 2",sub:"Weeks 4–6"}].map(({ p, label, sub }) => (
+            {[{ p: 1, label: "Phase 1", sub: "Weeks 1–3" }, { p: 2, label: "Phase 2", sub: "Weeks 4–6" }].map(({ p, label, sub }) => (
               <div key={p} onClick={() => setPhase(p)} style={{ flex: 1, padding: "16px 12px", textAlign: "center", borderRadius: 12, border: `1.5px solid ${phase === p ? T.green : T.border}`, background: phase === p ? T.greenDim : "transparent", cursor: "pointer", transition: "all 0.2s", boxShadow: phase === p ? `0 0 18px ${T.greenGlow}` : "none" }}>
                 <div style={{ color: phase === p ? T.green : T.gray, fontWeight: 800, fontSize: 14, fontFamily: font }}>{label}</div>
                 <div style={{ color: T.gray, fontSize: 11, marginTop: 3 }}>{sub}</div>
@@ -808,22 +661,20 @@ function PatientLogin({ onBegin }) {
             ))}
           </div>
         </div>
-        <Btn onClick={() => name && onBegin({ name, phase })} style={{ width: "100%", fontSize: 16 }} icon="arrow">Begin Session</Btn>
+        <Btn onClick={() => name && onBegin({ name, phase })} style={{ width: "100%", fontSize: 16 }} icon={ArrowRight}>Begin Session</Btn>
       </Card>
-
       <p className="fadeUp3" style={{ color: "#2A2A2A", fontSize: 12, marginTop: 28, position: "relative", zIndex: 1 }}>ValorPT v2.1 · HIPAA Compliant · SOC 2 Type II</p>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SCREEN 2: PROGRAM DASHBOARD (with stats bar + exercise cards)
+   SCREEN 2: PROGRAM DASHBOARD
 ═══════════════════════════════════════════════════════════════ */
 function ProgramDashboard({ patient, onStartSession }) {
   const exercises = patient.phase === 1 ? PHASE1_EXERCISES : PHASE2_EXERCISES;
   const done = exercises.filter(e => e.done).length;
   const nextIdx = exercises.findIndex(e => !e.done);
-
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white, paddingBottom: 90 }}>
       <Hero
@@ -832,21 +683,16 @@ function ProgramDashboard({ patient, onStartSession }) {
         right={<ProgressRing value={patient.week} max={6} size={62} strokeWidth={5} label={`W${patient.week}`} sublabel="of 6"/>}
       />
 
-      {/* STATS BAR */}
+      {/* Stats bar */}
       <div className="fadeUp2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, padding: "16px 16px 0" }}>
         {[
-          { label: "Current Phase", val: patient.phase, unit: "", color: T.green, sub: patient.phase === 1 ? "ROM & Quad" : "Strength" },
-          { label: "Sessions/Week", val: 4, unit: "", color: T.green, sub: "Target: 5" },
-          { label: "Avg Flexion",   val: "94°", unit: "", color: T.orange, sub: "↑ 6° this week" },
+          { label: "Current Phase", val: patient.phase, sub: patient.phase === 1 ? "ROM & Quad" : "Strength", color: T.green, Icon: Layers },
+          { label: "Sessions/Week", val: 4,             sub: "Target: 5",                                    color: T.green, Icon: Calendar },
+          { label: "Avg Flexion",   val: "94°",         sub: "↑ 6° this week",                               color: T.orange, Icon: TrendingUp },
         ].map(s => (
-          <div key={s.label} style={{
-            background: T.glass, backdropFilter: "blur(20px)",
-            border: `1px solid ${T.glassBorder}`,
-            borderRadius: 14, padding: "14px 10px",
-            textAlign: "center",
-            boxShadow: `0 0 20px rgba(0,200,83,0.07)`,
-          }}>
-            <div style={{ color: s.color, fontSize: 28, fontWeight: 900, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{s.val}</div>
+          <div key={s.label} style={{ background: T.glass, backdropFilter: "blur(20px)", border: `1px solid ${T.glassBorder}`, borderRadius: 14, padding: "14px 10px", textAlign: "center", boxShadow: "0 0 20px rgba(0,200,83,0.07)" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: s.color }}><s.Icon size={16}/></div>
+            <div style={{ color: s.color, fontSize: 26, fontWeight: 900, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{s.val}</div>
             <div style={{ color: T.gray, fontSize: 10, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>{s.label}</div>
             <div style={{ color: "#555", fontSize: 10, marginTop: 2 }}>{s.sub}</div>
           </div>
@@ -874,34 +720,25 @@ function ProgramDashboard({ patient, onStartSession }) {
             const isToday = i === nextIdx;
             const statusColor = ex.done ? T.green : isToday ? T.orange : T.grayD;
             return (
-              <div key={ex.id} className="card-hover" onClick={() => onStartSession(ex)} style={{
-                background: T.glass, backdropFilter: "blur(20px)",
-                border: `1px solid ${ex.done ? "rgba(0,200,83,0.2)" : isToday ? "rgba(255,149,0,0.25)" : T.glassBorder}`,
-                borderRadius: 14, overflow: "hidden", cursor: "pointer",
-                display: "flex", alignItems: "stretch",
-              }}>
-                {/* Left colored bar */}
-                <div style={{ width: 4, flexShrink: 0, background: statusColor, boxShadow: ex.done ? `0 0 8px ${T.green}80` : isToday ? `0 0 8px rgba(255,149,0,0.6)` : "none" }}/>
-                {/* Exercise icon */}
-                <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
-                  {ex.emoji}
+              <div key={ex.id} className="card-hover" onClick={() => onStartSession(ex)} style={{ background: T.glass, backdropFilter: "blur(20px)", border: `1px solid ${ex.done ? "rgba(0,200,83,0.2)" : isToday ? "rgba(255,149,0,0.25)" : T.glassBorder}`, borderRadius: 14, overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "stretch" }}>
+                <div style={{ width: 4, flexShrink: 0, background: statusColor, boxShadow: ex.done ? `0 0 8px ${T.green}80` : isToday ? "0 0 8px rgba(255,149,0,0.6)" : "none" }}/>
+                <div style={{ width: 50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: ex.done ? T.green : isToday ? T.orange : T.gray }}>
+                  <ex.Icon size={20}/>
                 </div>
-                {/* Content */}
                 <div style={{ flex: 1, padding: "13px 0", minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 14, color: ex.done ? T.gray : T.white }}>{ex.name}</div>
                   <div style={{ color: T.gray, fontSize: 12, marginTop: 2 }}>{ex.sets} · {ex.metric}</div>
                 </div>
-                {/* Right badge + chevron */}
                 <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "0 14px 0 8px" }}>
-                  {ex.done && <span style={{ background: T.greenDim, color: T.green, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 99 }}>✓</span>}
+                  {ex.done && <span style={{ background: T.greenDim, color: T.green, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 99, display: "flex", alignItems: "center", gap: 3 }}><Check size={10}/>Done</span>}
                   {isToday && <span style={{ background: "rgba(255,149,0,0.12)", color: T.orange, fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 99 }}>Next</span>}
-                  <I name="chevron" size={16} color={T.gray}/>
+                  <ChevronRight size={16} color={T.gray}/>
                 </div>
               </div>
             );
           })}
         </div>
-        <Btn onClick={() => onStartSession(exercises[nextIdx >= 0 ? nextIdx : 0])} style={{ width: "100%", marginTop: 20, fontSize: 16 }} icon="play">
+        <Btn onClick={() => onStartSession(exercises[nextIdx >= 0 ? nextIdx : 0])} style={{ width: "100%", marginTop: 20, fontSize: 16 }} icon={Play}>
           Start Today's Session
         </Btn>
       </div>
@@ -917,7 +754,6 @@ function ExerciseSession({ patient, exercise, onComplete, onBack }) {
   const [sets, setSets] = useState(0);
   const totalSets = 3;
   const fmt = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-
   const INSTRS = {
     "Lying Heel Slides": "Lie flat. Slowly slide heel toward buttocks as far as comfortable. Hold 2s, return slowly. Keep lower back flat throughout.",
     "Seated Heel Slides": "Sit in chair. Slide heel under chair bending knee maximally. Hold 2s at peak. Aim for increased range each rep.",
@@ -931,59 +767,55 @@ function ExerciseSession({ patient, exercise, onComplete, onBack }) {
     "Forward Lunges": "Step forward, lower back knee toward floor. Keep front knee over foot. Drive through heel back to start.",
   };
   const instr = INSTRS[exercise?.name] || "Perform movement slowly and with full control. Maintain proper alignment throughout.";
-
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white, paddingBottom: 90 }}>
       <div style={{ background: "linear-gradient(180deg, #0D2818 0%, transparent 100%)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 12, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -20, right: -20, width: 140, height: 140, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.2) 0%, transparent 70%)", pointerEvents: "none" }}/>
-        <button onClick={onBack} className="btn-press" style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 99, padding: "8px 12px", color: T.gray, cursor: "pointer", display: "flex" }}>
-          <ICONS.back size={18}/>
+        <button onClick={onBack} className="btn-press" style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 99, padding: "8px 12px", color: T.gray, cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <ChevronLeft size={18}/>
         </button>
         <div style={{ flex: 1, position: "relative" }}>
           <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: -0.3 }}>{exercise?.name}</div>
           <div style={{ color: T.green, fontSize: 12, marginTop: 1 }}>Phase {patient.phase} · Set {sets+1} of {totalSets}</div>
         </div>
-        <div style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 12, padding: "8px 14px", textAlign: "center" }}>
+        <div style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 12, padding: "8px 14px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+          <Timer size={12} color={T.gray}/>
           <div style={{ color: T.green, fontWeight: 900, fontSize: 18, fontVariantNumeric: "tabular-nums" }}>{fmt(m.t)}</div>
-          <div style={{ color: T.gray, fontSize: 9, textTransform: "uppercase", letterSpacing: 0.5 }}>Timer</div>
         </div>
       </div>
-
       <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
         <WebcamFeed kneeAngle={m.knee}/>
-
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {[
-            { label: "Knee Flexion", val: m.knee, unit: "°", color: T.orange },
-            { label: "Hip Flexion",  val: m.hip,  unit: "°", color: T.green },
-            { label: "Symmetry",     val: m.sym,  unit: "%", color: m.sym >= 80 ? T.green : T.red },
-            { label: "Reps",         val: m.reps, unit: "",  color: T.white },
+            { label: "Knee Flexion", val: m.knee, unit: "°", color: T.orange, Icon: Bone },
+            { label: "Hip Flexion",  val: m.hip,  unit: "°", color: T.green,  Icon: Activity },
+            { label: "Symmetry",     val: m.sym,  unit: "%", color: m.sym >= 80 ? T.green : T.red, Icon: Target },
+            { label: "Reps",         val: m.reps, unit: "",  color: T.white,  Icon: Zap },
           ].map(mc => (
             <Card key={mc.label} style={{ padding: "14px 16px", textAlign: "center" }}>
-              <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600, marginBottom: 5 }}>{mc.label}</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 5, color: T.gray }}>
+                <mc.Icon size={13}/><span style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>{mc.label}</span>
+              </div>
               <div style={{ color: mc.color, fontSize: 42, fontWeight: 900, fontVariantNumeric: "tabular-nums", lineHeight: 1, letterSpacing: -1 }}>
                 <AnimNum value={mc.val} suffix={mc.unit}/>
               </div>
             </Card>
           ))}
         </div>
-
         <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
           {Array.from({ length: totalSets }).map((_, i) => (
             <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: i <= sets ? T.green : T.grayD, boxShadow: i <= sets ? `0 0 6px ${T.green}` : "none" }}/>
           ))}
         </div>
-
         <Card style={{ padding: "14px 18px" }}>
           <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-            <I name="info" size={16} color={T.green}/>
+            <Info size={16} color={T.green} style={{ flexShrink: 0, marginTop: 1 }}/>
             <p style={{ color: T.gray, fontSize: 13, lineHeight: 1.6 }}>{instr}</p>
           </div>
         </Card>
-
-        <Btn onClick={() => { if (sets < totalSets - 1) setSets(s => s+1); else onComplete({ m, exercise }); }}
-          style={{ width: "100%", fontSize: 16 }} icon={sets < totalSets - 1 ? "check" : "arrow"}>
-          {sets < totalSets - 1 ? `Complete Set ${sets+1}` : "Finish Exercise"}
+        <Btn onClick={() => { if (sets < totalSets-1) setSets(s => s+1); else onComplete({ m, exercise }); }}
+          style={{ width: "100%", fontSize: 16 }} icon={sets < totalSets-1 ? Check : ArrowRight}>
+          {sets < totalSets-1 ? `Complete Set ${sets+1}` : "Finish Exercise"}
         </Btn>
       </div>
     </div>
@@ -995,46 +827,41 @@ function ExerciseSession({ patient, exercise, onComplete, onBack }) {
 ═══════════════════════════════════════════════════════════════ */
 function SessionResults({ result, onNext, onEnd }) {
   const repData = [22, 44, 72, 90, 100, 107, 104, 102, 108, 106, 104, 108, 107, 108, 108];
-  const W = 340, H = 100;
-  const pad = { t: 8, b: 16, l: 24, r: 8 };
+  const W = 340, H = 100, pad = { t: 8, b: 16, l: 24, r: 8 };
   const cw = W-pad.l-pad.r, ch = H-pad.t-pad.b, mn = 0, mx = 130;
   const pts = repData.map((v, i) => ({ x: pad.l+(i/(repData.length-1))*cw, y: pad.t+ch-((v-mn)/(mx-mn))*ch }));
   let d = `M ${pts[0].x} ${pts[0].y}`;
   for (let i = 1; i < pts.length; i++) { const cx = (pts[i-1].x+pts[i].x)/2; d += ` C ${cx} ${pts[i-1].y}, ${cx} ${pts[i].y}, ${pts[i].x} ${pts[i].y}`; }
   const area = `${d} L ${pts[pts.length-1].x} ${pad.t+ch} L ${pts[0].x} ${pad.t+ch} Z`;
-
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white, paddingBottom: 90 }}>
-      {/* Banner with ValorPT logo */}
       <div style={{ background: "linear-gradient(135deg, #0D2818, rgba(27,94,32,0.6), #0A0A0A)", padding: "40px 24px 32px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.14) 0%, transparent 65%)", pointerEvents: "none" }}/>
-        {/* Watermark */}
-        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", opacity: 0.08, pointerEvents: "none" }}>
-          <ValorIcon size={220}/>
-        </div>
-        {/* Logo centered */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, position: "relative" }}>
-          <ValorLogo size={64}/>
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", opacity: 0.08, pointerEvents: "none" }}><ValorIcon size={220}/></div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 16, position: "relative" }}><ValorLogo size={64}/></div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 14, position: "relative" }}>
+          <div style={{ width: 72, height: 72, borderRadius: "50%", background: T.greenDim, border: `1px solid ${T.greenBorder}`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 24px ${T.greenGlow}` }}>
+            <CheckCircle size={36} color={T.green}/>
+          </div>
         </div>
         <h2 style={{ fontFamily: font, fontWeight: 900, fontSize: 28, letterSpacing: -0.5, margin: "0 0 6px", position: "relative" }}>Exercise Complete!</h2>
         <p style={{ color: T.gray, fontSize: 14, position: "relative" }}>{result?.exercise?.name}</p>
       </div>
-
       <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[
-            { label: "Peak Flexion", val: "108°", trend: "↑ 6°" },
-            { label: "Avg Symmetry", val: "87%",  trend: "↑ 3%" },
-            { label: "Reps",         val: "15",   trend: "✓ Goal" },
+            { label: "Peak Flexion", val: "108°", trend: "↑ 6°",  Icon: TrendingUp },
+            { label: "Avg Symmetry", val: "87%",  trend: "↑ 3%",  Icon: Target },
+            { label: "Reps",         val: "15",   trend: "Goal",  Icon: CheckCircle },
           ].map(k => (
             <Card key={k.label} style={{ padding: "16px 10px", textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: T.green }}><k.Icon size={16}/></div>
               <div style={{ color: T.gray, fontSize: 10, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>{k.label}</div>
-              <div style={{ color: T.green, fontSize: 26, fontWeight: 900 }}>{k.val}</div>
+              <div style={{ color: T.green, fontSize: 24, fontWeight: 900 }}>{k.val}</div>
               <div style={{ color: T.green, fontSize: 10, marginTop: 5, fontWeight: 700 }}>{k.trend}</div>
             </Card>
           ))}
         </div>
-
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10, fontWeight: 600 }}>Knee Flexion by Rep</div>
           <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
@@ -1043,19 +870,17 @@ function SessionResults({ result, onNext, onEnd }) {
             <path d={d} fill="none" stroke={T.green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 4px ${T.green}60)` }}/>
           </svg>
         </Card>
-
         <Card glow>
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            <div style={{ fontSize: 32 }}>📈</div>
+            <div style={{ padding: 10, borderRadius: 12, background: T.greenDim, border: `1px solid ${T.greenBorder}`, flexShrink: 0 }}><TrendingUp size={24} color={T.green}/></div>
             <div>
               <div style={{ fontWeight: 800, color: T.green, fontSize: 15 }}>Great progress!</div>
               <div style={{ color: T.gray, fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>Peak flexion improved 6° vs last session. On track for 120° by Week 6.</div>
             </div>
           </div>
         </Card>
-
         <div style={{ display: "flex", gap: 10 }}>
-          <Btn onClick={onNext} style={{ flex: 2 }} icon="arrow">Next Exercise</Btn>
+          <Btn onClick={onNext} style={{ flex: 2 }} icon={ArrowRight}>Next Exercise</Btn>
           <Btn onClick={onEnd} variant="secondary" style={{ flex: 1 }}>End Session</Btn>
         </div>
       </div>
@@ -1064,7 +889,7 @@ function SessionResults({ result, onNext, onEnd }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   SCREEN 5: PROGRESS DASHBOARD (with large circular ring hero)
+   SCREEN 5: PROGRESS DASHBOARD
 ═══════════════════════════════════════════════════════════════ */
 function ProgressDashboard({ patient }) {
   const sessions = [
@@ -1074,28 +899,20 @@ function ProgressDashboard({ patient }) {
     { date: "Apr 20", exercises: 6, peak: 102 },
   ];
   const badges = [
-    { icon: "🏆", label: "First Session",   earned: true },
-    { icon: "📐", label: "Reached 90° ROM", earned: true },
-    { icon: "📅", label: "Week 2 Complete", earned: true },
-    { icon: "🔥", label: "5-Day Streak",    earned: false },
-    { icon: "⚡", label: "Phase 2 Ready",   earned: false },
+    { label: "First Session",   earned: true,  Icon: Star },
+    { label: "Reached 90° ROM", earned: true,  Icon: Award },
+    { label: "Week 2 Complete", earned: true,  Icon: CheckCircle },
+    { label: "5-Day Streak",    earned: false, Icon: Flame },
+    { label: "Phase 2 Ready",   earned: false, Icon: Zap },
   ];
-  // Overall program % = (week / 6) * 100
   const programPct = Math.round((patient.week / 6) * 100);
-  const r = 70, circ = 2 * Math.PI * r;
-  const offset = circ * (1 - programPct / 100);
-
+  const r = 70, circ = 2 * Math.PI * r, offset = circ * (1 - programPct / 100);
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white, paddingBottom: 90 }}>
-      {/* Hero with large ring */}
       <div style={{ background: "linear-gradient(180deg, #0D2818 0%, rgba(13,40,24,0.4) 60%, transparent 100%)", padding: "28px 20px 32px", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -60, right: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.22) 0%, transparent 65%)", pointerEvents: "none" }}/>
-        <div style={{ position: "absolute", top: 8, right: 16, opacity: 0.07, pointerEvents: "none" }}>
-          <ValorIcon size={160}/>
-        </div>
-
+        <div style={{ position: "absolute", top: 8, right: 16, opacity: 0.07, pointerEvents: "none" }}><ValorIcon size={160}/></div>
         <div style={{ display: "flex", alignItems: "center", gap: 20, position: "relative" }}>
-          {/* Large program ring */}
           <div style={{ position: "relative", width: 160, height: 160, flexShrink: 0 }}>
             <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: "rotate(-90deg)" }}>
               <defs>
@@ -1105,31 +922,25 @@ function ProgressDashboard({ patient }) {
                 </linearGradient>
               </defs>
               <circle cx="80" cy="80" r={r} fill="none" stroke="#1A1A1A" strokeWidth="10"/>
-              <circle cx="80" cy="80" r={r} fill="none" stroke="url(#heroRingGrad)" strokeWidth="10"
-                strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset}
-                className="ring-animate"
-                style={{ filter: `drop-shadow(0 0 12px rgba(0,200,83,0.7))`, transition: "stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)" }}/>
+              <circle cx="80" cy="80" r={r} fill="none" stroke="url(#heroRingGrad)" strokeWidth="10" strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset} className="ring-animate" style={{ filter: "drop-shadow(0 0 12px rgba(0,200,83,0.7))", transition: "stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)" }}/>
             </svg>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <div style={{ color: T.white, fontWeight: 900, fontSize: 36, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{programPct}%</div>
               <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginTop: 4 }}>Complete</div>
             </div>
           </div>
-
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 900, fontSize: 22, letterSpacing: -0.4, fontFamily: font }}>{patient.name}</div>
             <div style={{ color: T.green, fontSize: 14, fontWeight: 600, marginTop: 4 }}>Week {patient.week} of 6</div>
             <div style={{ color: T.gray, fontSize: 13, marginTop: 2 }}>Phase {patient.phase} ACL Rehab</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, background: T.greenDim, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "8px 14px", display: "inline-flex" }}>
-              <span style={{ fontSize: 16 }}>🔥</span>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 12, background: T.greenDim, border: `1px solid ${T.greenBorder}`, borderRadius: 10, padding: "8px 14px" }}>
+              <Flame size={16} color={T.green}/>
               <span style={{ color: T.green, fontWeight: 800, fontSize: 14 }}>4 day streak</span>
             </div>
           </div>
         </div>
       </div>
-
       <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Ring trio */}
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 18, fontWeight: 600 }}>Key Metrics</div>
           <div style={{ display: "flex", justifyContent: "space-around" }}>
@@ -1138,47 +949,47 @@ function ProgressDashboard({ patient }) {
             <ProgressRing value={3}   max={6}   size={88} label="W3"   sublabel="Progress" color="#00B8FF"/>
           </div>
         </Card>
-
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
             <div>
               <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Knee Flexion ROM</div>
               <div style={{ color: T.white, fontSize: 28, fontWeight: 900, marginTop: 4 }}>108°</div>
             </div>
-            <span style={{ color: T.green, fontSize: 12, fontWeight: 700, background: T.greenDim, padding: "4px 10px", borderRadius: 99 }}>↑ 43° since surgery</span>
+            <span style={{ color: T.green, fontSize: 12, fontWeight: 700, background: T.greenDim, padding: "4px 10px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}><TrendingUp size={12}/>43° since surgery</span>
           </div>
           <Chart data={ROM_DATA} label="rom" minVal={55} maxVal={125} height={120}/>
         </Card>
-
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
             <div>
               <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Symmetry Score</div>
               <div style={{ color: T.white, fontSize: 28, fontWeight: 900, marginTop: 4 }}>91%</div>
             </div>
-            <span style={{ color: T.orange, fontSize: 12, fontWeight: 700, background: "rgba(255,149,0,0.12)", padding: "4px 10px", borderRadius: 99 }}>↑ 18% since start</span>
+            <span style={{ color: T.orange, fontSize: 12, fontWeight: 700, background: "rgba(255,149,0,0.12)", padding: "4px 10px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}><TrendingUp size={12}/>18% since start</span>
           </div>
           <Chart data={SYM_DATA} label="sym" minVal={65} maxVal={100} height={100} color={T.orange}/>
         </Card>
-
+        {/* Milestones */}
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 16, fontWeight: 600 }}>Milestones</div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             {badges.map(b => (
-              <div key={b.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, opacity: b.earned ? 1 : 0.28, minWidth: 58 }}>
-                <div style={{ fontSize: 28, filter: b.earned ? `drop-shadow(0 0 8px ${T.green}80)` : "grayscale(1)" }}>{b.icon}</div>
+              <div key={b.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, opacity: b.earned ? 1 : 0.28, minWidth: 58 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: b.earned ? T.greenDim : T.grayD, border: `1px solid ${b.earned ? T.greenBorder : T.border}`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: b.earned ? `0 0 12px ${T.greenGlow}` : "none" }}>
+                  <b.Icon size={22} color={b.earned ? T.green : T.gray}/>
+                </div>
                 <span style={{ color: b.earned ? "#A5D6A7" : T.gray, fontSize: 10, textAlign: "center", lineHeight: 1.3, fontWeight: 600 }}>{b.label}</span>
               </div>
             ))}
           </div>
         </Card>
-
+        {/* Recent sessions */}
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 14, fontWeight: 600 }}>Recent Sessions</div>
           {sessions.map((s, i) => (
-            <div key={s.date} style={{ display: "flex", alignItems: "center", gap: 14, padding: "11px 0", borderBottom: i < sessions.length - 1 ? `1px solid ${T.border}` : "none" }}>
+            <div key={s.date} style={{ display: "flex", alignItems: "center", gap: 14, padding: "11px 0", borderBottom: i < sessions.length-1 ? `1px solid ${T.border}` : "none" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: T.greenDim, border: `1px solid ${T.greenBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <I name="calendar" size={16} color={T.green}/>
+                <Calendar size={16} color={T.green}/>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{s.date}</div>
@@ -1205,15 +1016,16 @@ function ClinicianDashboard({ onSelectPatient }) {
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white }}>
       <Hero title="Patient Overview" subtitle={`${CLINICIAN_PATIENTS.length} active · ${CLINICIAN_PATIENTS.filter(p=>p.flagged).length} flagged`}
-        right={<Btn variant="secondary" style={{ padding: "10px 16px", fontSize: 13, minHeight: 40 }} icon="plus">Add</Btn>}
+        right={<Btn variant="secondary" style={{ padding: "10px 16px", fontSize: 13, minHeight: 40 }} icon={Plus}>Add</Btn>}
       />
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, padding: "14px 16px 0" }}>
         {[
-          { label: "Patients",   val: 4,    color: T.green },
-          { label: "Compliance", val: "78%", color: T.orange },
-          { label: "Flagged",    val: 2,    color: T.red },
+          { label: "Patients",   val: 4,    color: T.green,  Icon: Users },
+          { label: "Compliance", val: "78%", color: T.orange, Icon: BarChart2 },
+          { label: "Flagged",    val: 2,    color: T.red,    Icon: AlertTriangle },
         ].map(k => (
           <Card key={k.label} style={{ padding: "14px 10px", textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: k.color }}><k.Icon size={18}/></div>
             <div style={{ color: k.color, fontSize: 28, fontWeight: 900 }}>{k.val}</div>
             <div style={{ color: T.gray, fontSize: 10, marginTop: 3, textTransform: "uppercase", letterSpacing: 0.5 }}>{k.label}</div>
           </Card>
@@ -1221,7 +1033,7 @@ function ClinicianDashboard({ onSelectPatient }) {
       </div>
       <div style={{ padding: "14px 16px" }}>
         <div style={{ position: "relative", marginBottom: 14 }}>
-          <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)" }}><I name="search" size={16} color={T.gray}/></div>
+          <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: T.gray }}><Search size={16}/></div>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search patients…"
             style={{ width: "100%", background: T.surface2, border: `1px solid ${T.border}`, borderRadius: 12, padding: "12px 14px 12px 40px", color: T.white, fontSize: 14, fontFamily: font }}/>
         </div>
@@ -1236,7 +1048,7 @@ function ClinicianDashboard({ onSelectPatient }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontWeight: 800, fontSize: 15 }}>{p.name}</span>
-                    {p.flagged && <I name="flag" size={14} color={T.red}/>}
+                    {p.flagged && <Flag size={14} color={T.red}/>}
                   </div>
                   <div style={{ color: T.gray, fontSize: 12, marginTop: 2 }}>Phase {p.phase} · Week {p.week} · Last: {p.lastSession}</div>
                 </div>
@@ -1262,17 +1074,17 @@ function ClinicianDashboard({ onSelectPatient }) {
 function ClinicianPatientView({ patient, onBack }) {
   const alerts = patient.flagged ? ["Knee flexion plateaued for 5 consecutive days", "Missed 2 consecutive sessions"] : [];
   const breakdown = [
-    { name: "Lying Heel Slides",   done: 9,  total: 12, metric: "88°" },
-    { name: "Seated Heel Slides",  done: 11, total: 12, metric: "82°" },
-    { name: "Straight Leg Raises", done: 10, total: 12, metric: "84%" },
-    { name: "Long Arc Quad",       done: 8,  total: 12, metric: "79°", warn: true },
+    { name: "Lying Heel Slides",   done: 9,  total: 12, metric: "88°",  warn: false },
+    { name: "Seated Heel Slides",  done: 11, total: 12, metric: "82°",  warn: false },
+    { name: "Straight Leg Raises", done: 10, total: 12, metric: "84%",  warn: false },
+    { name: "Long Arc Quad",       done: 8,  total: 12, metric: "79°",  warn: true },
   ];
   return (
     <div className="fadeUp" style={{ minHeight: "100vh", background: T.bg, color: T.white, paddingBottom: 40 }}>
       <div style={{ background: "linear-gradient(180deg, #0D2818 0%, transparent 100%)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,200,83,0.18) 0%, transparent 70%)", pointerEvents: "none" }}/>
-        <button onClick={onBack} className="btn-press" style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 99, padding: "8px 12px", cursor: "pointer", display: "flex" }}>
-          <ICONS.back size={18}/>
+        <button onClick={onBack} className="btn-press" style={{ background: T.grayD, border: `1px solid ${T.border}`, borderRadius: 99, padding: "8px 12px", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <ChevronLeft size={18} color={T.gray}/>
         </button>
         <span style={{ fontWeight: 800, fontSize: 17 }}>Patient Report</span>
       </div>
@@ -1285,7 +1097,7 @@ function ClinicianPatientView({ patient, onBack }) {
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                 <span style={{ fontWeight: 900, fontSize: 19 }}>{patient.name}</span>
-                {patient.flagged && <I name="flag" size={15} color={T.red}/>}
+                {patient.flagged && <Flag size={15} color={T.red}/>}
               </div>
               <div style={{ color: T.green, fontSize: 13, fontWeight: 600 }}>Phase {patient.phase} · Week {patient.week}</div>
               <div style={{ color: T.gray, fontSize: 12, marginTop: 1 }}>Surgery: 2026-04-01</div>
@@ -1293,33 +1105,31 @@ function ClinicianPatientView({ patient, onBack }) {
             <ProgressRing value={patient.compliance} max={100} size={68} label={`${patient.compliance}%`} sublabel="comply" color={patient.compliance >= 80 ? T.green : T.orange}/>
           </div>
         </Card>
-
         {alerts.length > 0 && (
           <Card style={{ border: `1px solid rgba(255,59,48,0.4)`, background: "rgba(255,59,48,0.06)" }}>
             <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
-              <I name="alert" size={18} color={T.red}/>
+              <AlertTriangle size={18} color={T.red}/>
               <span style={{ color: T.red, fontWeight: 800, fontSize: 14 }}>Clinical Alerts</span>
             </div>
             {alerts.map((a, i) => <div key={i} style={{ color: "#FFCDD2", fontSize: 13, padding: "7px 0", borderTop: i > 0 ? `1px solid rgba(255,59,48,0.15)` : "none", lineHeight: 1.5 }}>• {a}</div>)}
           </Card>
         )}
-
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
             <div><div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Knee Flexion ROM</div><div style={{ color: T.white, fontSize: 26, fontWeight: 900, marginTop: 4 }}>{ROM_DATA[Math.min(patient.week*2-1, ROM_DATA.length-1)]}°</div></div>
-            <span style={{ color: T.green, fontSize: 12, fontWeight: 700, background: T.greenDim, padding: "4px 10px", borderRadius: 99 }}>↑ trending</span>
+            <span style={{ color: T.green, fontSize: 12, fontWeight: 700, background: T.greenDim, padding: "4px 10px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}><TrendingUp size={12}/>trending</span>
           </div>
           <Chart data={ROM_DATA.slice(0, Math.min(patient.week*2, ROM_DATA.length))} label={`rom${patient.id}`} minVal={55} maxVal={125} height={120}/>
         </Card>
-
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
             <div><div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, fontWeight: 600 }}>Symmetry Score</div><div style={{ color: T.white, fontSize: 26, fontWeight: 900, marginTop: 4 }}>{SYM_DATA[Math.min(patient.week*2-1, SYM_DATA.length-1)]}%</div></div>
-            <span style={{ color: patient.flagged ? T.orange : T.green, fontSize: 12, fontWeight: 700, background: patient.flagged ? "rgba(255,149,0,0.12)" : T.greenDim, padding: "4px 10px", borderRadius: 99 }}>{patient.flagged ? "⚠ monitor" : "↑ trending"}</span>
+            <span style={{ color: patient.flagged ? T.orange : T.green, fontSize: 12, fontWeight: 700, background: patient.flagged ? "rgba(255,149,0,0.12)" : T.greenDim, padding: "4px 10px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}>
+              {patient.flagged ? <><AlertTriangle size={12}/>monitor</> : <><TrendingUp size={12}/>trending</>}
+            </span>
           </div>
           <Chart data={SYM_DATA.slice(0, Math.min(patient.week*2, SYM_DATA.length))} label={`sym${patient.id}`} minVal={65} maxVal={100} height={100} color={T.orange}/>
         </Card>
-
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12, fontWeight: 600 }}>Session Compliance</div>
           <div style={{ overflowX: "auto", paddingBottom: 4 }}><HeatMap weeks={12}/></div>
@@ -1329,12 +1139,11 @@ function ClinicianPatientView({ patient, onBack }) {
             <span style={{ color: T.gray, fontSize: 10 }}>More</span>
           </div>
         </Card>
-
         <Card>
           <div style={{ color: T.gray, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12, fontWeight: 600 }}>Exercise Breakdown</div>
           {breakdown.map((r, i) => (
             <div key={r.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < breakdown.length-1 ? `1px solid ${T.border}` : "none" }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: r.warn ? T.orange : T.green, flexShrink: 0, boxShadow: `0 0 6px ${r.warn ? T.orange : T.green}` }}/>
+              <div style={{ flexShrink: 0 }}>{r.warn ? <AlertTriangle size={14} color={T.orange}/> : <CheckCircle size={14} color={T.green}/>}</div>
               <div style={{ flex: 1, fontSize: 13, color: T.white, fontWeight: 500 }}>{r.name}</div>
               <div style={{ fontSize: 13 }}><span style={{ color: T.green, fontWeight: 700 }}>{r.done}</span><span style={{ color: T.gray }}>/{r.total}</span></div>
               <div style={{ color: T.green, fontWeight: 800, fontSize: 14, minWidth: 36, textAlign: "right" }}>{r.metric}</div>
@@ -1347,27 +1156,26 @@ function ClinicianPatientView({ patient, onBack }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BOTTOM NAV
+   BOTTOM NAV (Patient)
 ═══════════════════════════════════════════════════════════════ */
 function BottomNav({ active, onNav }) {
   const tabs = [
-    { id: "home",     icon: "home",    label: "Home" },
-    { id: "program",  icon: "program", label: "Program" },
-    { id: "record",   icon: "record",  label: "Record" },
-    { id: "progress", icon: "chart",   label: "Progress" },
-    { id: "profile",  icon: "person",  label: "Profile" },
+    { id: "home",     Icon: Home,          label: "Home" },
+    { id: "program",  Icon: ClipboardList, label: "Program" },
+    { id: "record",   Icon: Circle,        label: "Record" },
+    { id: "progress", Icon: TrendingUp,    label: "Progress" },
+    { id: "profile",  Icon: User,          label: "Profile" },
   ];
   return (
     <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "rgba(8,8,8,0.96)", backdropFilter: "blur(24px)", borderTop: `1px solid ${T.border}`, display: "flex", padding: "10px 0 14px", zIndex: 200 }}>
-      {tabs.map(t => {
-        const Ic = ICONS[t.icon];
-        const isActive = active === t.id;
+      {tabs.map(({ id, Icon: IconCmp, label }) => {
+        const isActive = active === id;
         return (
-          <button key={t.id} onClick={() => onNav(t.id)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <button key={id} onClick={() => onNav(id)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
             <div style={{ padding: "6px 14px", borderRadius: 99, background: isActive ? T.greenDim : "transparent", boxShadow: isActive ? `0 0 14px ${T.greenGlow}` : "none", transition: "all 0.25s", color: isActive ? T.green : T.gray }}>
-              <Ic size={20}/>
+              <IconCmp size={20}/>
             </div>
-            <span style={{ fontSize: 10, color: isActive ? T.green : T.gray, fontWeight: isActive ? 700 : 400, fontFamily: font }}>{t.label}</span>
+            <span style={{ fontSize: 10, color: isActive ? T.green : T.gray, fontWeight: isActive ? 700 : 400, fontFamily: font }}>{label}</span>
           </button>
         );
       })}
@@ -1376,29 +1184,26 @@ function BottomNav({ active, onNav }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TOP NAV (clinician) — with ValorPT logo left
+   TOP NAV (Clinician)
 ═══════════════════════════════════════════════════════════════ */
 function TopNav({ active, onNav }) {
   const tabs = [
-    { id: "patients",   icon: "patients",  label: "Patients" },
-    { id: "analytics",  icon: "analytics", label: "Analytics" },
-    { id: "messages",   icon: "messages",  label: "Messages" },
-    { id: "settings",   icon: "settings",  label: "Settings" },
+    { id: "patients",  Icon: Users,          label: "Patients" },
+    { id: "analytics", Icon: BarChart2,       label: "Analytics" },
+    { id: "messages",  Icon: MessageSquare,   label: "Messages" },
+    { id: "settings",  Icon: Settings,        label: "Settings" },
   ];
   return (
     <div style={{ background: "rgba(8,8,8,0.96)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", padding: "0 16px", position: "sticky", top: 0, zIndex: 100 }}>
-      {/* ValorPT Logo */}
       <div style={{ padding: "10px 14px 10px 0", marginRight: 4, display: "flex", alignItems: "center" }}>
         <ValorLogo size={32}/>
       </div>
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-        {tabs.map(t => {
-          const Ic = ICONS[t.icon];
-          const isActive = active === t.id;
+        {tabs.map(({ id, Icon: IconCmp, label }) => {
+          const isActive = active === id;
           return (
-            <button key={t.id} onClick={() => onNav(t.id)} style={{ background: "none", border: "none", padding: "14px 10px", display: "flex", alignItems: "center", gap: 5, color: isActive ? T.green : T.gray, fontWeight: isActive ? 700 : 400, fontSize: 12, cursor: "pointer", fontFamily: font, borderBottom: isActive ? `2px solid ${T.green}` : "2px solid transparent", transition: "all 0.2s", whiteSpace: "nowrap" }}>
-              <Ic size={14}/>
-              {t.label}
+            <button key={id} onClick={() => onNav(id)} style={{ background: "none", border: "none", padding: "14px 10px", display: "flex", alignItems: "center", gap: 5, color: isActive ? T.green : T.gray, fontWeight: isActive ? 700 : 400, fontSize: 12, cursor: "pointer", fontFamily: font, borderBottom: isActive ? `2px solid ${T.green}` : "2px solid transparent", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+              <IconCmp size={14}/>{label}
             </button>
           );
         })}
@@ -1416,9 +1221,9 @@ function TopNav({ active, onNav }) {
 function ModeToggle({ mode, setMode }) {
   return (
     <div style={{ position: "fixed", top: 14, right: 14, zIndex: 300, display: "flex", background: "rgba(8,8,8,0.88)", backdropFilter: "blur(16px)", border: `1px solid ${T.border}`, borderRadius: 99, overflow: "hidden", padding: 3 }}>
-      {[["patient","🧑"],["clinician","🩺"]].map(([m, emoji]) => (
-        <button key={m} onClick={() => setMode(m)} className="btn-press" style={{ padding: "6px 12px", border: "none", cursor: "pointer", borderRadius: 99, background: mode === m ? `linear-gradient(135deg, ${T.greenDeep}, ${T.green})` : "transparent", color: mode === m ? T.white : T.gray, fontWeight: mode === m ? 700 : 400, fontSize: 11, fontFamily: font, transition: "all 0.25s", boxShadow: mode === m ? `0 0 14px ${T.greenGlow}` : "none" }}>
-          {emoji} {m.charAt(0).toUpperCase() + m.slice(1)}
+      {[{ m: "patient", Icon: User, label: "Patient" }, { m: "clinician", Icon: Stethoscope, label: "Clinician" }].map(({ m, Icon: IconCmp, label }) => (
+        <button key={m} onClick={() => setMode(m)} className="btn-press" style={{ padding: "6px 12px", border: "none", cursor: "pointer", borderRadius: 99, background: mode === m ? `linear-gradient(135deg, ${T.greenDeep}, ${T.green})` : "transparent", color: mode === m ? T.white : T.gray, fontWeight: mode === m ? 700 : 400, fontSize: 11, fontFamily: font, transition: "all 0.25s", boxShadow: mode === m ? `0 0 14px ${T.greenGlow}` : "none", display: "flex", alignItems: "center", gap: 5 }}>
+          <IconCmp size={13}/>{label}
         </button>
       ))}
     </div>
@@ -1448,21 +1253,11 @@ export default function ValorPT() {
     if (tab === "progress") setScreen("progress");
   };
 
-  const handleExerciseComplete = (r) => {
-    setResult(r);
-    setShowCelebration(true);
-  };
-
-  const handleCelebrationDone = () => {
-    setShowCelebration(false);
-    setScreen("results");
-  };
-
   const renderPatient = () => {
     switch (screen) {
       case "login":    return <PatientLogin onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
       case "dashboard":return <ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }}/>;
-      case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={handleExerciseComplete} onBack={() => setScreen("dashboard")}/>;
+      case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/>;
       case "results":  return <SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")}/>;
       case "progress": return <ProgressDashboard patient={patient}/>;
       default: return null;
@@ -1480,17 +1275,11 @@ export default function ValorPT() {
   return (
     <>
       <style>{GLOBAL_CSS}</style>
-
       {!splashDone && <SplashScreen onDone={() => setSplashDone(true)}/>}
-
       <div style={{ fontFamily: font, background: T.bg, minHeight: "100vh", color: T.white, maxWidth: 480, margin: "0 auto", position: "relative", boxShadow: "0 0 100px rgba(0,0,0,0.9)", overflow: "hidden" }}>
         <AmbientBg/>
-
-        {/* Celebration overlay */}
-        {showCelebration && <CelebrationScreen exercise={exercise} onDone={handleCelebrationDone}/>}
-
+        {showCelebration && <CelebrationScreen exercise={exercise} onDone={() => { setShowCelebration(false); setScreen("results"); }}/>}
         <ModeToggle mode={mode} setMode={setMode}/>
-
         <div style={{ position: "relative", zIndex: 1 }}>
           {mode === "patient" ? (
             <>

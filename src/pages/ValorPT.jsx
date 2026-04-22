@@ -10,6 +10,7 @@ import {
   Volume2, Eye, AlertCircle, BookOpen, Crosshair
 } from "lucide-react";
 import ValorLogo, { ValorIcon } from "../components/ValorLogo";
+import AICoachDebrief from "../components/AICoachDebrief";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1287,6 +1288,7 @@ export default function ValorPT() {
   const [nav, setNav] = useState("home");
   const [clinicNav, setClinicNav] = useState("patients");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showDebrief, setShowDebrief] = useState(false);
 
   const handleNav = (tab) => {
     setNav(tab);
@@ -1341,7 +1343,8 @@ export default function ValorPT() {
       {!splashDone && <SplashScreen onDone={() => setSplashDone(true)}/>}
       <div style={{ fontFamily: font, background: T.bg, minHeight: "100vh", color: T.white, maxWidth: 480, margin: "0 auto", position: "relative", boxShadow: "0 0 100px rgba(0,0,0,0.9)", overflow: "hidden" }}>
         <AmbientBg/>
-        {showCelebration && <CelebrationScreen exercise={exercise} onDone={() => { setShowCelebration(false); setScreen("results"); }}/>}
+        {showCelebration && <CelebrationScreen exercise={exercise} onDone={() => { setShowCelebration(false); setShowDebrief(true); }}/>}
+        {showDebrief && <AICoachDebrief patient={patient} result={result} onDone={() => { setShowDebrief(false); setScreen("results"); }}/>}
         <ModeToggle mode={mode} setMode={setMode}/>
         <div style={{ position: "relative", zIndex: 1 }}>
           {mode === "patient" ? (

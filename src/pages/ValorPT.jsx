@@ -12,6 +12,7 @@ import {
 import ValorLogo, { ValorIcon } from "../components/ValorLogo";
 import AICoachDebrief from "../components/AICoachDebrief";
 import SessionReport from "../components/SessionReport";
+import ProgressDashboard from "../components/ProgressDashboard";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1148,46 +1149,7 @@ function SessionResults({ result, onNext, onEnd, onViewReport }) {
   );
 }
 
-function ProgressDashboard({ patient, onViewReport }) {
-  const sessions=[{date:"Apr 14",exercises:5,peak:82},{date:"Apr 16",exercises:6,peak:87},{date:"Apr 18",exercises:5,peak:94},{date:"Apr 20",exercises:6,peak:102}];
-  const badges=[{label:"First Session",earned:true,Icon:Star},{label:"Reached 90° ROM",earned:true,Icon:Award},{label:"Week 2 Complete",earned:true,Icon:CheckCircle},{label:"5-Day Streak",earned:false,Icon:Flame},{label:"Phase 2 Ready",earned:false,Icon:Zap}];
-  const programPct=Math.round((patient.week/6)*100),r=70,circ=2*Math.PI*r,offset=circ*(1-programPct/100);
-  return (
-    <div className="fadeUp" style={{minHeight:"100vh",background:T.bg,color:T.white,paddingBottom:90}}>
-      <div style={{background:"linear-gradient(180deg, #0D2818 0%, rgba(13,40,24,0.4) 60%, transparent 100%)",padding:"28px 20px 32px",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",top:-60,right:-60,width:280,height:280,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.22) 0%, transparent 65%)",pointerEvents:"none"}}/>
-        <div style={{position:"absolute",top:8,right:16,opacity:0.07,pointerEvents:"none"}}><ValorIcon size={160}/></div>
-        <div style={{display:"flex",alignItems:"center",gap:20,position:"relative"}}>
-          <div style={{position:"relative",width:160,height:160,flexShrink:0}}>
-            <svg width="160" height="160" viewBox="0 0 160 160" style={{transform:"rotate(-90deg)"}}>
-              <defs><linearGradient id="heroRingGrad" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#8BC34A"/><stop offset="100%" stopColor="#1B5E20"/></linearGradient></defs>
-              <circle cx="80" cy="80" r={r} fill="none" stroke="#1A1A1A" strokeWidth="10"/>
-              <circle cx="80" cy="80" r={r} fill="none" stroke="url(#heroRingGrad)" strokeWidth="10" strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset} className="ring-animate" style={{filter:"drop-shadow(0 0 12px rgba(0,200,83,0.7))",transition:"stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)"}}/>
-            </svg>
-            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-              <div style={{color:T.white,fontWeight:900,fontSize:36,fontVariantNumeric:"tabular-nums",lineHeight:1}}>{programPct}%</div>
-              <div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginTop:4}}>Complete</div>
-            </div>
-          </div>
-          <div style={{flex:1}}>
-            <div style={{fontWeight:900,fontSize:22,letterSpacing:-0.4,fontFamily:font}}>{patient.name}</div>
-            <div style={{color:T.green,fontSize:14,fontWeight:600,marginTop:4}}>Week {patient.week} of 6</div>
-            <div style={{color:T.gray,fontSize:13,marginTop:2}}>Phase {patient.phase} ACL Rehab</div>
-            <div style={{display:"inline-flex",alignItems:"center",gap:8,marginTop:12,background:T.greenDim,border:`1px solid ${T.greenBorder}`,borderRadius:10,padding:"8px 14px"}}><Flame size={16} color={T.green}/><span style={{color:T.green,fontWeight:800,fontSize:14}}>4 day streak</span></div>
-          </div>
-        </div>
-      </div>
-      <div style={{padding:"16px",display:"flex",flexDirection:"column",gap:14}}>
-        <Card><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginBottom:18,fontWeight:600}}>Key Metrics</div><div style={{display:"flex",justifyContent:"space-around"}}><ProgressRing value={108} max={130} size={88} label="108°" sublabel="ROM"/><ProgressRing value={91} max={100} size={88} label="91%" sublabel="Symmetry" color={T.orange}/><ProgressRing value={3} max={6} size={88} label="W3" sublabel="Progress" color="#00B8FF"/></div></Card>
-        <Card><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}><div><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,fontWeight:600}}>Knee Flexion ROM</div><div style={{color:T.white,fontSize:28,fontWeight:900,marginTop:4}}>108°</div></div><span style={{color:T.green,fontSize:12,fontWeight:700,background:T.greenDim,padding:"4px 10px",borderRadius:99,display:"flex",alignItems:"center",gap:4}}><TrendingUp size={12}/>43° since surgery</span></div><Chart data={ROM_DATA} label="rom" minVal={55} maxVal={125} height={120}/></Card>
-        <Card><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}><div><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,fontWeight:600}}>Symmetry Score</div><div style={{color:T.white,fontSize:28,fontWeight:900,marginTop:4}}>91%</div></div><span style={{color:T.orange,fontSize:12,fontWeight:700,background:"rgba(255,149,0,0.12)",padding:"4px 10px",borderRadius:99,display:"flex",alignItems:"center",gap:4}}><TrendingUp size={12}/>18% since start</span></div><Chart data={SYM_DATA} label="sym" minVal={65} maxVal={100} height={100} color={T.orange}/></Card>
-        <Card><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginBottom:16,fontWeight:600}}>Milestones</div><div style={{display:"flex",gap:12,flexWrap:"wrap"}}>{badges.map(b=><div key={b.label} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,opacity:b.earned?1:0.28,minWidth:58}}><div style={{width:44,height:44,borderRadius:12,background:b.earned?T.greenDim:T.grayD,border:`1px solid ${b.earned?T.greenBorder:T.border}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:b.earned?`0 0 12px ${T.greenGlow}`:"none"}}><b.Icon size={22} color={b.earned?T.green:T.gray}/></div><span style={{color:b.earned?"#A5D6A7":T.gray,fontSize:10,textAlign:"center",lineHeight:1.3,fontWeight:600}}>{b.label}</span></div>)}</div></Card>
-        <Card><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginBottom:14,fontWeight:600}}>Recent Sessions</div>{sessions.map((s,i)=><div key={s.date} style={{display:"flex",alignItems:"center",gap:14,padding:"11px 0",borderBottom:i<sessions.length-1?`1px solid ${T.border}`:"none"}}><div style={{width:38,height:38,borderRadius:10,background:T.greenDim,border:`1px solid ${T.greenBorder}`,display:"flex",alignItems:"center",justifyContent:"center"}}><Calendar size={16} color={T.green}/></div><div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{s.date}</div><div style={{color:T.gray,fontSize:12,marginTop:1}}>{s.exercises} exercises</div></div><div style={{textAlign:"right"}}><div style={{color:T.green,fontWeight:900,fontSize:18}}>{s.peak}°</div><div style={{color:T.gray,fontSize:10}}>peak ROM</div></div></div>)}</Card>
-        <Btn onClick={onViewReport} variant="ghost" style={{width:"100%"}} icon={FileText}>View Last Session Report</Btn>
-      </div>
-    </div>
-  );
-}
+// ProgressDashboard is now imported from components/ProgressDashboard.jsx
 
 /* ═══════════════════════════════════════════════════════════════
    CLINICIAN SCREENS

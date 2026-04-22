@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { X, Settings, Check } from "lucide-react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { X, Settings, Check, StopCircle } from "lucide-react";
 import * as tf from "@tensorflow/tfjs";
 import * as poseDetection from "@tensorflow-models/pose-detection";
-import { getExerciseGifUrl } from "./ExerciseFigure";
 
 const SKELETON_PAIRS = [
   ["left_shoulder", "right_shoulder"],
@@ -101,52 +100,8 @@ const CUES = {
   "Forward Lunges":       "Keep your front knee aligned with your foot",
 };
 
-/* ─── Compact GIF demo (inline in session panel) ─── */
-function DemoFigure({ exerciseName }) {
-  const [failed, setFailed] = useState(false);
-  const url = getExerciseGifUrl(exerciseName);
-
-  if (!url || failed) {
-    return (
-      <div style={{
-        width: "100%", height: "100%",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "#FFFFFF", fontSize: 14, fontWeight: 700, fontFamily: font,
-        textAlign: "center", padding: 12,
-      }}>
-        {exerciseName || "Exercise"}
-      </div>
-    );
-  }
-
-  return (
-    <div style={{
-      position: "relative", width: "100%", height: "100%",
-      borderRadius: 16, overflow: "hidden", background: "#000000",
-    }}>
-      <img
-        src={url}
-        alt={exerciseName}
-        onError={() => setFailed(true)}
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-      />
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "rgba(0,200,83,0.07)",
-        mixBlendMode: "color",
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)",
-        pointerEvents: "none",
-      }} />
-    </div>
-  );
-}
-
 /* ─── Real-time pose detection camera (MoveNet Lightning) ─── */
-function PoseCamera({ countdown, onMetrics }) {
+const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics }, ref) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const detectorRef = useRef(null);
@@ -156,6 +111,17 @@ function PoseCamera({ countdown, onMetrics }) {
   const [modelLoading, setModelLoading] = useState(true);
   const [cameraActive, setCameraActive] = useState(false);
   const [denied, setDenied] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    stop: () => {
+      videoRef.current?.srcObject?.getTracks().forEach(t => t.stop());
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      detectorRef.current?.dispose?.();
+      detectorRef.current = null;
+      streamRef.current = null;
+    },
+    getLastAngle: () => smoothedRef.current,
+  }));
 
   const drawSkeleton = (pose, canvas, video) => {
     if (!canvas || !video) return;
@@ -378,10 +344,10 @@ function PoseCamera({ countdown, onMetrics }) {
       )}
     </div>
   );
-}
+});
 
 
-export default function ExerciseSession({ patient, exercise, onComplete, onBack }) {
+export default function ExerciseSession({ patient, exercise, onComplete, onBack, onViewReport }) {
   const [countdown, setCountdown] = useState(3);
   const [elapsed, setElapsed] = useState(0);
   const [reps, setReps] = useState(0);
@@ -391,11 +357,33 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack 
   const [showFlash, setShowFlash] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const repPhaseRef = useRef("up"); // "up" = extended, "down" = flexed
+  const poseRef = useRef(null);
+  const [stopHover, setStopHover] = useState(false);
 
   const TARGET_REPS = 15;
   const TOTAL_SETS = 3;
   const exerciseName = exercise?.name || "Exercise";
-  const cue = CUES[exerciseName] || "Perform each rep slowly with full control";
+  const cue = exercise?.steps?.[0] || CUES[exerciseName] || "Perform each rep slowly with full control";
+  const setsReps = exercise?.sets || "3 × 15";
+
+  const handleStopAndViewReport = () => {
+    const last = poseRef.current?.getLastAngle?.() || { left: kneeL, right: kneeR };
+    const lastKnee = Math.round(last.right ?? last.left ?? kneeR ?? kneeL ?? 0);
+    poseRef.current?.stop?.();
+    const payload = {
+      exerciseName,
+      repsCompleted: reps,
+      peakKneeFlexion: lastKnee,
+      sessionDuration: elapsed,
+      symmetryScore: 91,
+      formScore: 87,
+      // legacy fields consumed by AICoachDebrief
+      exercise,
+      m: { knee: lastKnee, sym: 91, reps, hip: 44 },
+    };
+    if (onViewReport) onViewReport(payload);
+    else if (onComplete) onComplete(payload);
+  };
 
   /* Countdown */
   useEffect(() => {
@@ -481,7 +469,38 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack 
 
       {/* ── CAMERA SECTION (65%) ── */}
       <div style={{ flex: "0 0 65%", position: "relative", padding: "56px 12px 0" }}>
-        <PoseCamera countdown={countdown} onMetrics={handlePoseMetrics} />
+        <PoseCamera ref={poseRef} countdown={countdown} onMetrics={handlePoseMetrics} />
+
+        {/* Stop & View Report — always visible, bottom-center of camera area */}
+        <div style={{
+          position: "absolute", bottom: 16, left: 0, right: 0,
+          display: "flex", justifyContent: "center", zIndex: 15,
+          pointerEvents: "none",
+        }}>
+          <button
+            onClick={handleStopAndViewReport}
+            onMouseEnter={() => setStopHover(true)}
+            onMouseLeave={() => setStopHover(false)}
+            style={{
+              pointerEvents: "auto",
+              height: 52, minWidth: 200,
+              padding: "0 20px",
+              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 10,
+              background: stopHover ? "#00C853" : "rgba(0,0,0,0.8)",
+              border: "2px solid #00C853",
+              borderRadius: 26,
+              color: "#FFFFFF", fontWeight: 700, fontSize: 15, fontFamily: font,
+              cursor: "pointer",
+              boxShadow: stopHover
+                ? "0 0 30px rgba(0,200,83,0.5)"
+                : "0 0 20px rgba(0,200,83,0.3)",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <StopCircle size={20} color={stopHover ? "#FFFFFF" : "#00C853"} />
+            Stop &amp; View Report
+          </button>
+        </div>
 
         {/* Knee angle HUD — bottom-left of camera feed */}
         {recording && (kneeL != null || kneeR != null) && (
@@ -560,51 +579,62 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack 
       {/* ── DIVIDER ── */}
       <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #00C853, transparent)", opacity: 0.5, flexShrink: 0 }} />
 
-      {/* ── DEMONSTRATION PANEL (35%) ── */}
+      {/* ── COACHING PANEL (35%) ── */}
       <div style={{
         flex: "0 0 35%", background: "#000000",
-        position: "relative", overflow: "hidden",
+        position: "relative",
         display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        padding: "28px 24px",
+        borderTop: "1px solid #00C853",
       }}>
-        {/* Scanline */}
         <div style={{
-          position: "absolute", left: 0, right: 0, height: 1.5,
-          background: "linear-gradient(90deg, transparent, rgba(120,200,255,0.07), transparent)",
-          animation: "scanline 6s linear infinite",
-          pointerEvents: "none", zIndex: 3,
-        }} />
-        {/* Ambient glow */}
+          color: "#FFFFFF", fontWeight: 700, fontSize: 24,
+          textAlign: "center", letterSpacing: -0.3, lineHeight: 1.2,
+        }}>
+          {exerciseName}
+        </div>
         <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 60% 80% at 50% 50%, rgba(100,180,255,0.04) 0%, transparent 70%)",
-        }} />
-
-        {/* Label */}
-        <div style={{ padding: "8px 16px 0", flexShrink: 0, position: "relative", zIndex: 4 }}>
-          <span style={{ color: "#444", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.2 }}>
-            Demonstration
-          </span>
+          color: "#A0A0A0", fontSize: 16, marginTop: 6, textAlign: "center",
+          fontVariantNumeric: "tabular-nums",
+        }}>
+          {setsReps}
+        </div>
+        <div style={{
+          color: "#A0A0A0", fontSize: 14, fontStyle: "italic",
+          marginTop: 10, textAlign: "center", maxWidth: 420, lineHeight: 1.4,
+        }}>
+          {cue}
         </div>
 
-        {/* Figure */}
+        {/* Set progress — 3 dots */}
         <div style={{
-          flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-          position: "relative", zIndex: 2, overflow: "hidden", padding: "0 16px",
+          display: "flex", flexDirection: "column", alignItems: "center",
+          gap: 8, marginTop: 18,
         }}>
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <DemoFigure exerciseName={exerciseName} />
+          <div style={{
+            color: "#00C853", fontSize: 12, fontWeight: 700,
+            textTransform: "uppercase", letterSpacing: 1.5,
+          }}>
+            Set {sets} of {TOTAL_SETS}
           </div>
-        </div>
-
-        {/* Coaching cue */}
-        <div style={{
-          padding: "0 16px 12px", textAlign: "center", flexShrink: 0, position: "relative", zIndex: 4,
-        }}>
-          <div style={{ color: "#555", fontSize: 11, marginBottom: 2 }}>
-            ↑ Match this movement
-          </div>
-          <div style={{ color: "#777", fontSize: 12, fontWeight: 500 }}>
-            {cue}
+          <div style={{ display: "flex", gap: 10 }}>
+            {Array.from({ length: TOTAL_SETS }).map((_, i) => {
+              const filled = i < sets - 1 || (i === sets - 1 && setDone);
+              const current = i === sets - 1 && !setDone;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: 10, height: 10, borderRadius: "50%",
+                    background: filled ? "#00C853" : (current ? "rgba(0,200,83,0.35)" : "rgba(255,255,255,0.12)"),
+                    border: current ? "1px solid #00C853" : "1px solid transparent",
+                    boxShadow: filled ? "0 0 8px rgba(0,200,83,0.6)" : "none",
+                    transition: "all 0.3s ease",
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

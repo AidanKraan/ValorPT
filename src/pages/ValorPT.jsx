@@ -922,48 +922,6 @@ function Hero({ title, subtitle, right }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   WEBCAM & POSE
-═══════════════════════════════════════════════════════════════ */
-function PoseCanvas({ kneeAngle }) {
-  const ref = useRef(null), raf = useRef(null);
-  useEffect(() => {
-    const c = ref.current; if (!c) return;
-    const ctx = c.getContext("2d");
-    const draw = () => {
-      const W = c.width, H = c.height; ctx.clearRect(0, 0, W, H);
-      const lift = (kneeAngle / 130) * H * 0.10;
-      const j = { head: {x:W*.5,y:H*.11}, neck: {x:W*.5,y:H*.22}, sL: {x:W*.36,y:H*.30}, sR: {x:W*.64,y:H*.30}, hipL: {x:W*.39,y:H*.50}, hipR: {x:W*.61,y:H*.50}, kneeL: {x:W*.37,y:H*.66-lift}, kneeR: {x:W*.63,y:H*.66-lift}, ankleL: {x:W*.35,y:H*.84}, ankleR: {x:W*.65,y:H*.84} };
-      const bone = (a, b) => { const gr = ctx.createLinearGradient(a.x,a.y,b.x,b.y); gr.addColorStop(0,"rgba(0,200,83,0.75)"); gr.addColorStop(1,"rgba(0,200,83,0.55)"); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=gr; ctx.lineWidth=2.5; ctx.lineCap="round"; ctx.stroke(); };
-      [["head","neck"],["neck","sL"],["neck","sR"],["sL","hipL"],["sR","hipR"],["hipL","hipR"],["hipL","kneeL"],["hipR","kneeR"],["kneeL","ankleL"],["kneeR","ankleR"]].forEach(([a,b])=>bone(j[a],j[b]));
-      Object.entries(j).forEach(([k,pt]) => { const isKnee = k==="kneeL"||k==="kneeR"; if(isKnee){ctx.beginPath();ctx.arc(pt.x,pt.y,14,0,Math.PI*2);ctx.fillStyle="rgba(255,149,0,0.18)";ctx.fill();} const gr=ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,10); gr.addColorStop(0,isKnee?"rgba(255,149,0,0.5)":"rgba(0,200,83,0.4)"); gr.addColorStop(1,"transparent"); ctx.beginPath();ctx.arc(pt.x,pt.y,10,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill(); ctx.beginPath();ctx.arc(pt.x,pt.y,isKnee?7:5.5,0,Math.PI*2);ctx.fillStyle=isKnee?"#FF9500":T.green;ctx.fill();ctx.strokeStyle="rgba(255,255,255,0.6)";ctx.lineWidth=1.5;ctx.stroke(); });
-      const kL=j.kneeL,hip=j.hipL,ank=j.ankleL; const a1=Math.atan2(hip.y-kL.y,hip.x-kL.x),a2=Math.atan2(ank.y-kL.y,ank.x-kL.x); ctx.beginPath();ctx.arc(kL.x,kL.y,24,a1,a2);ctx.strokeStyle="rgba(255,149,0,0.8)";ctx.lineWidth=2;ctx.stroke(); ctx.fillStyle="#FF9500";ctx.font="bold 11px Inter,sans-serif";ctx.fillText(`${kneeAngle}°`,kL.x+18,kL.y-12);
-      raf.current = requestAnimationFrame(draw);
-    };
-    raf.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf.current);
-  }, [kneeAngle]);
-  return <canvas ref={ref} width={420} height={360} style={{ position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none" }}/>;
-}
-
-function WebcamFeed({ kneeAngle }) {
-  const vidRef = useRef(null); const [active,setActive]=useState(false); const [err,setErr]=useState(false);
-  useEffect(() => { let stream; navigator.mediaDevices.getUserMedia({video:true}).then(s=>{stream=s;if(vidRef.current)vidRef.current.srcObject=s;setActive(true);}).catch(()=>setErr(true)); return ()=>stream?.getTracks().forEach(t=>t.stop()); },[]);
-  return (
-    <div style={{ position:"relative",width:"100%",height:360,borderRadius:20,overflow:"hidden",border:`1.5px solid ${T.greenBorder}`,boxShadow:`0 0 40px ${T.greenGlow}`,background:T.surface }}>
-      {active?<video ref={vidRef} autoPlay playsInline muted style={{width:"100%",height:"100%",objectFit:"cover",transform:"scaleX(-1)"}}/>:<div style={{width:"100%",height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12}}><div style={{padding:16,borderRadius:16,background:T.grayD,color:T.gray}}><Camera size={32}/></div><div style={{color:T.gray,fontSize:13,textAlign:"center"}}>{err?"Camera denied — simulation active":"Activating camera…"}</div></div>}
-      <PoseCanvas kneeAngle={kneeAngle}/>
-      <div style={{position:"absolute",top:14,right:14,display:"flex",alignItems:"center",gap:6,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(10px)",border:`1px solid ${T.greenBorder}`,borderRadius:99,padding:"5px 12px"}}><div className="live-pulse" style={{width:7,height:7,borderRadius:"50%",background:T.green}}/><span style={{color:T.white,fontSize:11,fontWeight:800,letterSpacing:1.5}}>LIVE</span></div>
-    </div>
-  );
-}
-
-function useMetrics(phase) {
-  const [m,setM]=useState({knee:20,hip:15,sym:82,reps:0,t:0});
-  const s=useRef({t:0,phase:"down",count:0,start:Date.now()});
-  useEffect(()=>{const id=setInterval(()=>{s.current.t+=0.038;const tt=s.current.t,maxK=phase===2?118:98;const knee=Math.round(18+((Math.sin(tt)+1)/2)*(maxK-18));const hip=Math.round(10+((Math.sin(tt+0.3)+1)/2)*68);const sym=Math.round(83+Math.sin(tt*1.8)*7);const elapsed=Math.floor((Date.now()-s.current.start)/1000);if(knee>maxK*0.78&&s.current.phase==="down")s.current.phase="up";else if(knee<28&&s.current.phase==="up"){s.current.phase="down";s.current.count=Math.min(s.current.count+1,15);}setM({knee,hip,sym,reps:s.current.count,t:elapsed});},80);return()=>clearInterval(id);},[phase]);
-  return m;
-}
 
 function HeatMap({ weeks=12 }) {
   const cells=useRef(Array.from({length:weeks*7},()=>{const r=Math.random();return r>0.35?(r>0.75?2:1):0;}));
@@ -1236,7 +1194,7 @@ export default function ValorPT() {
     const buildDemoExercise = () => {
       const name = "Straight Leg Raises";
       const d = EXERCISE_DB[name] || {};
-      return { name, phase: d.phase, sets: d.sets, metric: d.metric, muscles: d.muscles };
+      return { name, phase: d.phase, sets: d.sets, metric: d.metric, muscles: d.muscles, steps: d.steps };
     };
     const onKey = (e) => {
       const tag = e.target?.tagName;
@@ -1278,6 +1236,8 @@ export default function ValorPT() {
     return () => window.removeEventListener("keydown", onKey);
   }, [showReport, showDebrief, showCelebration, detailExercise, screen, result]);
 
+  const enrichEx = (ex) => ex ? { ...ex, steps: ex.steps ?? EXERCISE_DB[ex.name]?.steps } : ex;
+
   const handleNav = (tab) => {
     setNav(tab);
     setDetailExercise(null);
@@ -1291,7 +1251,7 @@ export default function ValorPT() {
   };
 
   const handleStartRecording = (ex) => {
-    setExercise(ex);
+    setExercise(enrichEx(ex));
     setDetailExercise(null);
     setScreen("session");
   };
@@ -1309,10 +1269,16 @@ export default function ValorPT() {
     }
     switch (screen) {
       case "login":    return <WelcomeScreen onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
-      case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
+      case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(enrichEx(ex)); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
       case "session":  return (
         <CameraErrorBoundary onBack={() => setScreen("dashboard")}>
-          <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")} />
+          <ExerciseSession
+            patient={patient}
+            exercise={exercise}
+            onComplete={r => { setResult(r); setShowCelebration(true); }}
+            onViewReport={r => { setResult(r); setScreen("results"); setShowDebrief(true); }}
+            onBack={() => setScreen("dashboard")}
+          />
         </CameraErrorBoundary>
       );
       case "results":  return <div className="slide-in-right"><SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/></div>;

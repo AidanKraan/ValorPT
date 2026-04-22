@@ -1,23 +1,16 @@
-import { useState } from "react";
-
 /* ══════════════════════════════════════════════════════════
-   GIF-BASED EXERCISE DEMONSTRATIONS
+   EXERCISE FIGURE — clean minimal panel
+   No GIFs, videos, or iframes. Pure typography + progress dots.
 ══════════════════════════════════════════════════════════ */
 
 const font = `'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif`;
 
-const GIF_MAP = {
-  "Lying Heel Slides":    "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
-  "Seated Heel Slides":   "https://media.giphy.com/media/3o7TKwmnDgQb5jemjK/giphy.gif",
-  "Straight Leg Raises":  "https://media.giphy.com/media/xT9IgG50Lg7russbD6/giphy.gif",
-  "Long Arc Quad":        "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif",
-  "Air Squats (60°)":     "https://media.giphy.com/media/l46Cy1rHbQ92uuLXa/giphy.gif",
-  "Air Squats (30°)":     "https://media.giphy.com/media/l46Cy1rHbQ92uuLXa/giphy.gif",
-  "Single Leg Squat 50%": "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif",
-  "Single Leg Squat Max": "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif",
-  "Step-Ups":             "https://media.giphy.com/media/xT9IgG50Lg7russbD6/giphy.gif",
-  "Forward Lunges":       "https://media.giphy.com/media/l46Cy1rHbQ92uuLXa/giphy.gif",
-};
+const FIGURE_CSS = `
+  @keyframes repPulse {
+    0%, 100% { transform: scale(1);   opacity: 1;   box-shadow: 0 0 10px rgba(0,200,83,0.7); }
+    50%      { transform: scale(1.25); opacity: 0.7; box-shadow: 0 0 18px rgba(0,200,83,1); }
+  }
+`;
 
 const SETS_MAP = {
   "Lying Heel Slides":    "3 × 15 reps",
@@ -32,44 +25,45 @@ const SETS_MAP = {
   "Forward Lunges":       "3 × 10 reps",
 };
 
-export function getExerciseGifUrl(exerciseName) {
-  return GIF_MAP[exerciseName] || null;
+const FIRST_CUES = {
+  "Lying Heel Slides":    "Lie on your back with both legs extended and your operative heel resting on the surface.",
+  "Seated Heel Slides":   "Sit upright in a chair with both feet flat on the floor, hip-width apart.",
+  "Straight Leg Raises":  "Lie flat on your back with the non-operative leg bent, foot flat on the floor.",
+  "Long Arc Quad":        "Sit on a chair with both knees bent at 90°.",
+  "Air Squats (60°)":     "Stand with feet shoulder-width apart, toes slightly pointing outward.",
+  "Air Squats (30°)":     "Stand with feet shoulder-width apart, arms extended forward for balance.",
+  "Single Leg Squat 50%": "Stand on your operative leg, the other leg lifted slightly off the floor.",
+  "Single Leg Squat Max": "Balance on the operative leg; the non-operative leg is lifted forward.",
+  "Step-Ups":             "Stand facing a low step or platform with your operative leg on it.",
+  "Forward Lunges":       "Stand tall with feet hip-width apart, arms at your sides.",
+};
+
+export function getExerciseSets(name) {
+  return SETS_MAP[name] || "";
 }
 
-export function getExerciseSets(exerciseName) {
-  return SETS_MAP[exerciseName] || "";
-}
+/*
+  ExerciseFigure
+  Props:
+  - exerciseName (required)
+  - reps         (optional) — number of reps completed in current set
+  - totalReps    (optional) — total reps per set (for context)
+  - sets         (optional override for "3 × 15 reps" label)
+  - firstCue     (optional override for the italic coaching cue)
+*/
+export default function ExerciseFigure({
+  exerciseName,
+  reps = 0,
+  totalReps = 3,
+  sets,
+  firstCue,
+}) {
+  const label = sets ?? SETS_MAP[exerciseName] ?? "";
+  const cue = firstCue ?? FIRST_CUES[exerciseName] ?? "Perform each rep slowly with full control.";
 
-/* Fallback dark card when GIF fails to load */
-function FallbackCard({ exerciseName, sets }) {
-  return (
-    <div style={{
-      position: "absolute", inset: 0,
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      background: "#000000", color: "#FFFFFF",
-      fontFamily: font, textAlign: "center", padding: 24,
-    }}>
-      <div style={{
-        color: "#A0A0A0", fontSize: 10, fontWeight: 700,
-        textTransform: "uppercase", letterSpacing: 2, marginBottom: 10,
-      }}>
-        Demonstration
-      </div>
-      <div style={{ color: "#FFFFFF", fontSize: 22, fontWeight: 800, lineHeight: 1.2 }}>
-        {exerciseName}
-      </div>
-      {sets && (
-        <div style={{ color: "#A0A0A0", fontSize: 14, marginTop: 6 }}>{sets}</div>
-      )}
-    </div>
-  );
-}
-
-export default function ExerciseFigure({ exerciseName }) {
-  const [failed, setFailed] = useState(false);
-  const gifUrl = GIF_MAP[exerciseName];
-  const sets = SETS_MAP[exerciseName] || "";
+  const DOT_COUNT = 3;
+  const completed = Math.min(Math.floor((reps / Math.max(totalReps, 1)) * DOT_COUNT), DOT_COUNT);
+  const isCurrent = (i) => i === completed && completed < DOT_COUNT;
 
   return (
     <div style={{
@@ -78,71 +72,77 @@ export default function ExerciseFigure({ exerciseName }) {
       aspectRatio: "9/16",
       maxHeight: "75vh",
       background: "#000000",
+      borderTop: "1px solid #00C853",
       borderRadius: 16,
       overflow: "hidden",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 28,
+      fontFamily: font,
     }}>
-      {gifUrl && !failed ? (
-        <img
-          src={gifUrl}
-          alt={exerciseName}
-          onError={() => setFailed(true)}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        />
-      ) : (
-        <FallbackCard exerciseName={exerciseName} sets={sets} />
-      )}
+      <style>{FIGURE_CSS}</style>
 
-      {/* Green tint overlay */}
       <div style={{
-        position: "absolute", inset: 0,
-        background: "rgba(0,200,83,0.07)",
-        mixBlendMode: "color",
-        pointerEvents: "none",
-      }} />
-
-      {/* Scanline overlay */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)",
-        pointerEvents: "none",
-      }} />
-
-      {/* Bottom gradient with label */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0,
-        background: "linear-gradient(transparent, rgba(0,0,0,0.85))",
-        padding: 16,
-        pointerEvents: "none",
+        color: "#FFFFFF",
+        fontWeight: 700,
+        fontSize: 24,
+        textAlign: "center",
+        letterSpacing: -0.3,
+        lineHeight: 1.2,
+        maxWidth: 420,
       }}>
+        {exerciseName}
+      </div>
+
+      {label && (
         <div style={{
           color: "#A0A0A0",
-          fontSize: 10,
-          textTransform: "uppercase",
-          letterSpacing: 2,
-          fontFamily: font,
-          fontWeight: 600,
+          fontSize: 16,
+          marginTop: 8,
+          textAlign: "center",
+          fontVariantNumeric: "tabular-nums",
         }}>
-          Demonstration
+          {label}
         </div>
-        <div style={{
-          color: "#FFFFFF",
-          fontSize: 18,
-          fontWeight: 700,
-          fontFamily: font,
-          marginTop: 2,
-        }}>
-          {exerciseName}
-        </div>
-        {sets && (
-          <div style={{
-            color: "#A0A0A0",
-            fontSize: 14,
-            fontFamily: font,
-            marginTop: 2,
-          }}>
-            {sets}
-          </div>
-        )}
+      )}
+
+      <div style={{
+        color: "#A0A0A0",
+        fontSize: 14,
+        fontStyle: "italic",
+        marginTop: 12,
+        textAlign: "center",
+        maxWidth: 420,
+        lineHeight: 1.45,
+      }}>
+        {cue}
+      </div>
+
+      {/* Rep progress — 3 dots */}
+      <div style={{ display: "flex", gap: 12, marginTop: 22 }}>
+        {Array.from({ length: DOT_COUNT }).map((_, i) => {
+          const filled = i < completed;
+          const current = isCurrent(i);
+          return (
+            <div
+              key={i}
+              style={{
+                width: 12, height: 12, borderRadius: "50%",
+                background: filled
+                  ? "#00C853"
+                  : current
+                    ? "#00C853"
+                    : "rgba(255,255,255,0.12)",
+                border: "none",
+                boxShadow: filled ? "0 0 10px rgba(0,200,83,0.6)" : "none",
+                animation: current ? "repPulse 1.1s ease-in-out infinite" : "none",
+                transition: "background 0.3s ease",
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

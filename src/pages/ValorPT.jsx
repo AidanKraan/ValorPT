@@ -13,6 +13,7 @@ import ValorLogo, { ValorIcon } from "../components/ValorLogo";
 import AICoachDebrief from "../components/AICoachDebrief";
 import SessionReport from "../components/SessionReport";
 import ProgressDashboard from "../components/ProgressDashboard";
+import ExerciseFigure from "../components/ExerciseFigure";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -613,9 +614,9 @@ function ExerciseDetailPage({ exercise, onBack, onStartRecording }) {
 
       <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 24 }}>
 
-        {/* VIDEO PLAYER */}
+        {/* ANIMATED ANATOMICAL FIGURE */}
         <div className="fadeUp2">
-          <VideoPlayerMock exercise={exercise.name} data={data}/>
+          <ExerciseFigure exerciseName={exercise.name} />
         </div>
 
         {/* HOW TO PERFORM */}

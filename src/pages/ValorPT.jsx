@@ -9,6 +9,7 @@ import {
   Shield, Check, Stethoscope, Bone, Maximize2,
   Volume2, Eye, AlertCircle, BookOpen, Crosshair
 } from "lucide-react";
+import ValorLogo, { ValorIcon } from "../components/ValorLogo";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -358,40 +359,9 @@ const ROM_DATA = [65, 68, 72, 76, 80, 85, 90, 95, 100, 105, 110, 113, 115];
 const SYM_DATA = [73, 75, 78, 80, 82, 84, 86, 87, 89, 90, 91, 92, 93];
 
 /* ═══════════════════════════════════════════════════════════════
-   VALOR LOGO
+   VALOR LOGO — imported from components/ValorLogo.jsx
 ═══════════════════════════════════════════════════════════════ */
-function ValorIcon({ size = 48 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-      <defs>
-        <linearGradient id="vi_g1" x1="50" y1="5" x2="50" y2="95" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#8BC34A"/><stop offset="50%" stopColor="#4CAF50"/><stop offset="100%" stopColor="#1B5E20"/>
-        </linearGradient>
-        <linearGradient id="vi_g2" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#AED581"/><stop offset="100%" stopColor="#2E7D32"/>
-        </linearGradient>
-      </defs>
-      <circle cx="54" cy="14" r="9" fill="url(#vi_g2)"/>
-      <path d="M50 22 C38 18,14 28,8 48 C16 38,30 32,44 36 Z" fill="url(#vi_g1)" opacity="0.95"/>
-      <path d="M46 36 C34 38,16 52,18 68 C24 56,36 46,50 48 Z" fill="url(#vi_g1)" opacity="0.85"/>
-      <path d="M32 55 C36 62,44 72,52 78 C60 64,72 44,88 28" stroke="url(#vi_g1)" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <path d="M52 78 C58 68,72 44,90 26" stroke="url(#vi_g2)" strokeWidth="12" strokeLinecap="round" fill="none" opacity="0.9"/>
-    </svg>
-  );
-}
-function ValorLogo({ size = 40, showText = true }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: size * 0.25 }}>
-      <ValorIcon size={size}/>
-      {showText && (
-        <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-          <span style={{ fontFamily: font, fontWeight: 900, fontSize: size * 0.52, color: T.white, letterSpacing: -0.5, lineHeight: 1 }}>VALOR</span>
-          <span style={{ fontFamily: font, fontWeight: 900, fontSize: size * 0.52, color: T.green, letterSpacing: -0.5, lineHeight: 1 }}>PT</span>
-        </div>
-      )}
-    </div>
-  );
-}
+// ValorIcon, ValorLogo imported at top of file
 function ValorWatermark({ size = 200 }) {
   return <div style={{ opacity: 0.06, pointerEvents: "none" }}><ValorIcon size={size}/></div>;
 }
@@ -794,12 +764,10 @@ function SplashScreen({ onDone }) {
   }, []);
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "#000", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 24, animation: fading ? "splashFadeOut 0.5s ease forwards" : "splashFadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
-      <div style={{ animation: "scaleIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}><ValorIcon size={90}/></div>
+      <div style={{ animation: "scaleIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards" }}>
+        <ValorLogo height={80} darkBg={true} />
+      </div>
       <div style={{ animation: "fadeUp 0.6s 0.3s both", textAlign: "center" }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 4, marginTop: 16 }}>
-          <span style={{ fontFamily: font, fontWeight: 900, fontSize: 38, color: T.white, letterSpacing: -1 }}>VALOR</span>
-          <span style={{ fontFamily: font, fontWeight: 900, fontSize: 38, color: T.green, letterSpacing: -1 }}>PT</span>
-        </div>
         <p style={{ color: T.gray, fontSize: 13, textAlign: "center", marginTop: 6, letterSpacing: 2, textTransform: "uppercase" }}>Clinical AI Motion Analysis</p>
       </div>
       <div style={{ animation: "fadeIn 0.4s 0.6s both" }}>
@@ -841,7 +809,7 @@ function CelebrationScreen({ exercise, onDone }) {
         <div style={{ position: "absolute", inset: -8, borderRadius: "50%", boxShadow: `0 0 40px ${T.greenGlow}`, pointerEvents: "none" }}/>
       </div>
       <div style={{ textAlign: "center", animation: "fadeUp 0.5s 0.4s both", position: "relative", zIndex: 2 }}>
-        <div style={{ display: "flex", justifyContent: "center" }}><ValorLogo size={56} showText={false}/></div>
+        <div style={{ display: "flex", justifyContent: "center" }}><ValorLogo height={56} darkBg={true} /></div>
         <h2 style={{ fontFamily: font, fontWeight: 900, fontSize: 34, color: T.white, marginTop: 16, letterSpacing: -0.8 }}>Great Work!</h2>
         <p style={{ color: T.gray, fontSize: 15, marginTop: 6 }}>{exercise?.name}</p>
       </div>
@@ -1004,11 +972,7 @@ function PatientLogin({ onBegin }) {
       <div style={{position:"absolute",top:"10%",left:"50%",transform:"translateX(-50%)",width:400,height:400,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 65%)",pointerEvents:"none"}}/>
       <div className="fadeUp" style={{textAlign:"center",marginBottom:48,position:"relative",zIndex:1}}>
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%, -50%)",opacity:0.06,pointerEvents:"none"}}><ValorIcon size={300}/></div>
-        <div style={{position:"relative"}}><ValorIcon size={120}/></div>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginTop:20}}>
-          <span style={{fontFamily:font,fontWeight:900,fontSize:44,color:T.white,letterSpacing:-2}}>VALOR</span>
-          <span style={{fontFamily:font,fontWeight:900,fontSize:44,color:T.green,letterSpacing:-2}}>PT</span>
-        </div>
+        <div style={{position:"relative"}}><ValorLogo height={80} darkBg={true} /></div>
         <p style={{color:T.gray,fontSize:13,marginTop:6,letterSpacing:2,textTransform:"uppercase"}}>Clinical AI Motion Analysis</p>
       </div>
       <Card className="fadeUp2" style={{width:"100%",maxWidth:400,padding:32,position:"relative",zIndex:1}}>
@@ -1149,7 +1113,7 @@ function SessionResults({ result, onNext, onEnd }) {
       <div style={{background:"linear-gradient(135deg, #0D2818, rgba(27,94,32,0.6), #0A0A0A)",padding:"40px 24px 32px",textAlign:"center",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:320,height:320,borderRadius:"50%",background:"radial-gradient(circle, rgba(0,200,83,0.14) 0%, transparent 65%)",pointerEvents:"none"}}/>
         <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",opacity:0.08,pointerEvents:"none"}}><ValorIcon size={220}/></div>
-        <div style={{display:"flex",justifyContent:"center",marginBottom:16,position:"relative"}}><ValorLogo size={64}/></div>
+        <div style={{display:"flex",justifyContent:"center",marginBottom:16,position:"relative"}}><ValorLogo height={48} darkBg={true} /></div>
         <div style={{display:"flex",justifyContent:"center",marginBottom:14,position:"relative"}}>
           <div style={{width:72,height:72,borderRadius:"50%",background:T.greenDim,border:`1px solid ${T.greenBorder}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 24px ${T.greenGlow}`}}><CheckCircle size={36} color={T.green}/></div>
         </div>
@@ -1288,7 +1252,7 @@ function TopNav({ active, onNav }) {
   const tabs=[{id:"patients",Icon:Users,label:"Patients"},{id:"analytics",Icon:BarChart2,label:"Analytics"},{id:"messages",Icon:MessageSquare,label:"Messages"},{id:"settings",Icon:Settings,label:"Settings"}];
   return (
     <div style={{background:"rgba(8,8,8,0.96)",backdropFilter:"blur(24px)",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",padding:"0 16px",position:"sticky",top:0,zIndex:100}}>
-      <div style={{padding:"10px 14px 10px 0",marginRight:4,display:"flex",alignItems:"center"}}><ValorLogo size={32}/></div>
+      <div style={{padding:"10px 14px 10px 0",marginRight:4,display:"flex",alignItems:"center"}}><ValorLogo height={32} darkBg={true} /></div>
       <div style={{display:"flex",flex:1,overflow:"hidden"}}>{tabs.map(({id,Icon:IconCmp,label})=>{const isActive=active===id;return(<button key={id} onClick={()=>onNav(id)} style={{background:"none",border:"none",padding:"14px 10px",display:"flex",alignItems:"center",gap:5,color:isActive?T.green:T.gray,fontWeight:isActive?700:400,fontSize:12,cursor:"pointer",fontFamily:font,borderBottom:isActive?`2px solid ${T.green}`:"2px solid transparent",transition:"all 0.2s",whiteSpace:"nowrap"}}><IconCmp size={14}/>{label}</button>);})}</div>
       <div style={{width:32,height:32,borderRadius:"50%",background:`linear-gradient(135deg, ${T.greenDeep}, ${T.green})`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:12,color:T.white,flexShrink:0}}>DR</div>
     </div>

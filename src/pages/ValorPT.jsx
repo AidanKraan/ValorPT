@@ -14,6 +14,7 @@ import AICoachDebrief from "../components/AICoachDebrief";
 import SessionReport from "../components/SessionReport";
 import ProgressDashboard from "../components/ProgressDashboard";
 import ExerciseFigure from "../components/ExerciseFigure";
+import WelcomeScreen from "../components/WelcomeScreen";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1291,7 +1292,7 @@ export default function ValorPT() {
       );
     }
     switch (screen) {
-      case "login":    return <PatientLogin onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
+      case "login":    return <WelcomeScreen onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
       case "dashboard":return <div className="slide-in-left"><ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/></div>;
       case "session":  return <div className="slide-in-right"><ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/></div>;
       case "results":  return <div className="slide-in-right"><SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/></div>;

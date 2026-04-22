@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
-import { X, Settings, Check, StopCircle } from "lucide-react";
+import { X, Settings, Check, StopCircle, FlipHorizontal } from "lucide-react";
 import * as tf from "@tensorflow/tfjs";
 import * as poseDetection from "@tensorflow-models/pose-detection";
 
@@ -257,7 +257,7 @@ const PoseCamera = forwardRef(function PoseCamera({ countdown, onMetrics, videoR
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       detectorRef.current?.dispose?.();
       detectorRef.current = null;
-      streamRef.current?.getTracks().forEach(t => t.stop());
+      videoRef.current?.srcObject?.getTracks().forEach(t => t.stop());
       streamRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -358,6 +358,32 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
   const poseRef = useRef(null);
   const videoRef = useRef(null);
   const animFrameRef = useRef(null);
+  const [facingMode, setFacingMode] = useState('user');
+
+  const flipCamera = async () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newMode);
+    if (videoRef.current?.srcObject) {
+      videoRef.current.srcObject
+        .getTracks().forEach(t => t.stop());
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: newMode },
+      });
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch {
+      /* If the new camera isn't available (e.g. desktop w/o rear cam),
+         fall back to the previous mode so the user isn't stranded on a black feed. */
+      setFacingMode(facingMode);
+      try {
+        const fallback = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode },
+        });
+        if (videoRef.current) videoRef.current.srcObject = fallback;
+      } catch { /* nothing we can do */ }
+    }
+  };
 
   const TARGET_REPS = 15;
   const TOTAL_SETS = 3;
@@ -504,6 +530,24 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
           </div>
         )}
 
+        {/* Camera flip — top-right of camera feed */}
+        <button
+          onClick={flipCamera}
+          aria-label="Flip camera"
+          style={{
+            position: "absolute", top: 68, right: 24, zIndex: 20,
+            width: 44, height: 44,
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.6)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          <FlipHorizontal size={20} color="#FFFFFF" />
+        </button>
+
         {/* REC indicator */}
         {recording && (
           <div style={{
@@ -532,7 +576,7 @@ export default function ExerciseSession({ patient, exercise, onComplete, onBack,
         {/* Exercise info + rep counter */}
         {recording && (
           <div style={{
-            position: "absolute", top: 68, right: 24, zIndex: 10,
+            position: "absolute", top: 68, right: 80, zIndex: 10,
             background: "rgba(0,0,0,0.72)", backdropFilter: "blur(12px)",
             border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12,
             padding: "10px 14px", textAlign: "center",

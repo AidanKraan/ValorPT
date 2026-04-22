@@ -7,10 +7,11 @@ import {
   BarChart2, Users, MessageSquare, Settings,
   Award, Flame, Star, Layers, Dumbbell, MoveUp, Repeat,
   Shield, Check, Stethoscope, Bone, Maximize2,
-  Volume2, Eye, AlertCircle, BookOpen, Crosshair
+  Volume2, Eye, AlertCircle, BookOpen, Crosshair, FileText
 } from "lucide-react";
 import ValorLogo, { ValorIcon } from "../components/ValorLogo";
 import AICoachDebrief from "../components/AICoachDebrief";
+import SessionReport from "../components/SessionReport";
 
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1103,7 +1104,7 @@ function ExerciseSession({ patient, exercise, onComplete, onBack }) {
   );
 }
 
-function SessionResults({ result, onNext, onEnd }) {
+function SessionResults({ result, onNext, onEnd, onViewReport }) {
   const repData=[22,44,72,90,100,107,104,102,108,106,104,108,107,108,108];
   const W=340,H=100,pad={t:8,b:16,l:24,r:8},cw=W-pad.l-pad.r,ch=H-pad.t-pad.b,mn=0,mx=130;
   const pts=repData.map((v,i)=>({x:pad.l+(i/(repData.length-1))*cw,y:pad.t+ch-((v-mn)/(mx-mn))*ch}));
@@ -1141,12 +1142,13 @@ function SessionResults({ result, onNext, onEnd }) {
           <Btn onClick={onNext} style={{flex:2}} icon={ArrowRight}>Next Exercise</Btn>
           <Btn onClick={onEnd} variant="secondary" style={{flex:1}}>End Session</Btn>
         </div>
+        <Btn onClick={onViewReport} variant="ghost" style={{width:"100%"}} icon={FileText}>View Full Session Report</Btn>
       </div>
     </div>
   );
 }
 
-function ProgressDashboard({ patient }) {
+function ProgressDashboard({ patient, onViewReport }) {
   const sessions=[{date:"Apr 14",exercises:5,peak:82},{date:"Apr 16",exercises:6,peak:87},{date:"Apr 18",exercises:5,peak:94},{date:"Apr 20",exercises:6,peak:102}];
   const badges=[{label:"First Session",earned:true,Icon:Star},{label:"Reached 90° ROM",earned:true,Icon:Award},{label:"Week 2 Complete",earned:true,Icon:CheckCircle},{label:"5-Day Streak",earned:false,Icon:Flame},{label:"Phase 2 Ready",earned:false,Icon:Zap}];
   const programPct=Math.round((patient.week/6)*100),r=70,circ=2*Math.PI*r,offset=circ*(1-programPct/100);
@@ -1181,6 +1183,7 @@ function ProgressDashboard({ patient }) {
         <Card><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}><div><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,fontWeight:600}}>Symmetry Score</div><div style={{color:T.white,fontSize:28,fontWeight:900,marginTop:4}}>91%</div></div><span style={{color:T.orange,fontSize:12,fontWeight:700,background:"rgba(255,149,0,0.12)",padding:"4px 10px",borderRadius:99,display:"flex",alignItems:"center",gap:4}}><TrendingUp size={12}/>18% since start</span></div><Chart data={SYM_DATA} label="sym" minVal={65} maxVal={100} height={100} color={T.orange}/></Card>
         <Card><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginBottom:16,fontWeight:600}}>Milestones</div><div style={{display:"flex",gap:12,flexWrap:"wrap"}}>{badges.map(b=><div key={b.label} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,opacity:b.earned?1:0.28,minWidth:58}}><div style={{width:44,height:44,borderRadius:12,background:b.earned?T.greenDim:T.grayD,border:`1px solid ${b.earned?T.greenBorder:T.border}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:b.earned?`0 0 12px ${T.greenGlow}`:"none"}}><b.Icon size={22} color={b.earned?T.green:T.gray}/></div><span style={{color:b.earned?"#A5D6A7":T.gray,fontSize:10,textAlign:"center",lineHeight:1.3,fontWeight:600}}>{b.label}</span></div>)}</div></Card>
         <Card><div style={{color:T.gray,fontSize:11,textTransform:"uppercase",letterSpacing:0.8,marginBottom:14,fontWeight:600}}>Recent Sessions</div>{sessions.map((s,i)=><div key={s.date} style={{display:"flex",alignItems:"center",gap:14,padding:"11px 0",borderBottom:i<sessions.length-1?`1px solid ${T.border}`:"none"}}><div style={{width:38,height:38,borderRadius:10,background:T.greenDim,border:`1px solid ${T.greenBorder}`,display:"flex",alignItems:"center",justifyContent:"center"}}><Calendar size={16} color={T.green}/></div><div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>{s.date}</div><div style={{color:T.gray,fontSize:12,marginTop:1}}>{s.exercises} exercises</div></div><div style={{textAlign:"right"}}><div style={{color:T.green,fontWeight:900,fontSize:18}}>{s.peak}°</div><div style={{color:T.gray,fontSize:10}}>peak ROM</div></div></div>)}</Card>
+        <Btn onClick={onViewReport} variant="ghost" style={{width:"100%"}} icon={FileText}>View Last Session Report</Btn>
       </div>
     </div>
   );
@@ -1289,6 +1292,7 @@ export default function ValorPT() {
   const [clinicNav, setClinicNav] = useState("patients");
   const [showCelebration, setShowCelebration] = useState(false);
   const [showDebrief, setShowDebrief] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   const handleNav = (tab) => {
     setNav(tab);
@@ -1323,8 +1327,8 @@ export default function ValorPT() {
       case "login":    return <PatientLogin onBegin={p => { setPatient({ ...SAMPLE_PATIENT, ...p }); setScreen("dashboard"); }}/>;
       case "dashboard":return <ProgramDashboard patient={patient} onStartSession={ex => { setExercise(ex); setScreen("session"); }} onViewDetail={handleViewDetail}/>;
       case "session":  return <ExerciseSession patient={patient} exercise={exercise} onComplete={r => { setResult(r); setShowCelebration(true); }} onBack={() => setScreen("dashboard")}/>;
-      case "results":  return <SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")}/>;
-      case "progress": return <ProgressDashboard patient={patient}/>;
+      case "results":  return <SessionResults result={result} onNext={() => setScreen("dashboard")} onEnd={() => setScreen("dashboard")} onViewReport={() => setShowReport(true)}/>;
+      case "progress": return <ProgressDashboard patient={patient} onViewReport={() => setShowReport(true)}/>;
       default: return null;
     }
   };
@@ -1345,6 +1349,7 @@ export default function ValorPT() {
         <AmbientBg/>
         {showCelebration && <CelebrationScreen exercise={exercise} onDone={() => { setShowCelebration(false); setShowDebrief(true); }}/>}
         {showDebrief && <AICoachDebrief patient={patient} result={result} onDone={() => { setShowDebrief(false); setScreen("results"); }}/>}
+        {showReport && <SessionReport patient={patient} exercise={exercise} onBack={() => setShowReport(false)} />}
         <ModeToggle mode={mode} setMode={setMode}/>
         <div style={{ position: "relative", zIndex: 1 }}>
           {mode === "patient" ? (
